@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:dcterms="http://purl.org/dc/terms/"
+	xmlns:dcmitype="http://purl.org/dc/dcmitype/"
+	xmlns:dcam="http://purl.org/dc/dcam/"
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+	xmlns:owl="http://www.w3.org/2002/07/owl#"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+	xmlns:skos="http://www.w3.org/2004/02/skos/core#">
+
+<rdf:Description rdf:about="http://purl.org/NET/dc_owl2dl/dcmitype">
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Ontology"/>
+	<rdfs:label xml:lang="en">DCMI Type Vocabulary</rdfs:label>
+	<rdfs:comment xml:lang="en">OWL 2 DL ontology for the Dublin Core type vocabulary from the http://purl.org/dc/dcmitype/ namespace</rdfs:comment>
+	<owl:imports rdf:resource="http://purl.org/NET/dc_owl2dl/dcam"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/dc/dcmitype/Collection">
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+	<rdfs:label xml:lang="en-us">Collection</rdfs:label>
+	<skos:definition xml:lang="en-us">An aggregation of resources.</skos:definition>
+	<rdfs:comment xml:lang="en-us">A collection is described as a group; its parts may also be separately described.</rdfs:comment>
+	<dcam:memberOf rdf:resource="http://purl.org/dc/terms/DCMIType"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/dc/dcmitype/Dataset">
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+	<rdfs:label xml:lang="en-us">Dataset</rdfs:label>
+	<skos:definition xml:lang="en-us">Data encoded in a defined structure.</skos:definition>
+	<rdfs:comment xml:lang="en-us">Examples include lists, tables, and databases. A dataset may be useful for direct machine processing.</rdfs:comment>
+	<dcam:memberOf rdf:resource="http://purl.org/dc/terms/DCMIType"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/dc/dcmitype/Event">
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+	<rdfs:label xml:lang="en-us">Event</rdfs:label>
+	<skos:definition xml:lang="en-us">A non-persistent, time-based occurrence.</skos:definition>
+	<rdfs:comment xml:lang="en-us">Metadata for an event provides descriptive information that is the basis for discovery of the purpose, location, duration, and responsible agents associated with an event. Examples include an exhibition, webcast, conference, workshop, open day, performance, battle, trial, wedding, tea party, conflagration.</rdfs:comment>
+	<dcam:memberOf rdf:resource="http://purl.org/dc/terms/DCMIType"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/dc/dcmitype/Image">
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+	<rdfs:label xml:lang="en-us">Image</rdfs:label>
+	<skos:definition xml:lang="en-us">A visual representation other than text.</skos:definition>
+	<rdfs:comment xml:lang="en-us">Examples include images and photographs of physical objects, paintings, prints, drawings, other images and graphics, animations and moving pictures, film, diagrams, maps, musical notation. Note that Image may include both electronic and physical representations.</rdfs:comment>
+	<dcam:memberOf rdf:resource="http://purl.org/dc/terms/DCMIType"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/dc/dcmitype/InteractiveResource">
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+	<rdfs:label xml:lang="en-us">Interactive Resource</rdfs:label>
+	<skos:definition xml:lang="en-us">A resource requiring interaction from the user to be understood, executed, or experienced.</skos:definition>
+	<rdfs:comment xml:lang="en-us">Examples include forms on Web pages, applets, multimedia learning objects, chat services, or virtual reality environments.</rdfs:comment>
+	<dcam:memberOf rdf:resource="http://purl.org/dc/terms/DCMIType"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/dc/dcmitype/MovingImage">
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+	<rdfs:label xml:lang="en-us">Moving Image</rdfs:label>
+	<skos:definition xml:lang="en-us">A series of visual representations imparting an impression of motion when shown in succession.</skos:definition>
+	<rdfs:comment xml:lang="en-us">Examples include animations, movies, television programs, videos, zoetropes, or visual output from a simulation. Instances of the type Moving Image must also be describable as instances of the broader type Image.</rdfs:comment>
+	<rdfs:subClassOf rdf:resource="http://purl.org/dc/dcmitype/Image"/>
+	<dcam:memberOf rdf:resource="http://purl.org/dc/terms/DCMIType"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/dc/dcmitype/PhysicalObject">
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+	<rdfs:label xml:lang="en-us">Physical Object</rdfs:label>
+	<skos:definition xml:lang="en-us">An inanimate, three-dimensional object or substance.</skos:definition>
+	<rdfs:comment xml:lang="en-us">Note that digital representations of, or surrogates for, these objects should use Image, Text or one of the other types.</rdfs:comment>
+	<dcam:memberOf rdf:resource="http://purl.org/dc/terms/DCMIType"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/dc/dcmitype/Service">
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+	<rdfs:label xml:lang="en-us">Service</rdfs:label>
+	<skos:definition xml:lang="en-us">A system that provides one or more functions.</skos:definition>
+	<rdfs:comment xml:lang="en-us">Examples include a photocopying service, a banking service, an authentication service, interlibrary loans, a Z39.50 or Web server.</rdfs:comment>
+	<dcam:memberOf rdf:resource="http://purl.org/dc/terms/DCMIType"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/dc/dcmitype/Software">
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+	<rdfs:label xml:lang="en-us">Software</rdfs:label>
+	<skos:definition xml:lang="en-us">A computer program in source or compiled form.</skos:definition>
+	<rdfs:comment xml:lang="en-us">Examples include a C source file, MS-Windows .exe executable, or Perl script.</rdfs:comment>
+	<dcam:memberOf rdf:resource="http://purl.org/dc/terms/DCMIType"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/dc/dcmitype/Sound">
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+	<rdfs:label xml:lang="en-us">Sound</rdfs:label>
+	<skos:definition xml:lang="en-us">A resource primarily intended to be heard.</skos:definition>
+	<rdfs:comment xml:lang="en-us">Examples include a music playback file format, an audio compact disc, and recorded speech or sounds.</rdfs:comment>
+	<dcam:memberOf rdf:resource="http://purl.org/dc/terms/DCMIType"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/dc/dcmitype/StillImage">
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+	<rdfs:label xml:lang="en-us">Still Image</rdfs:label>
+	<skos:definition xml:lang="en-us">A static visual representation.</skos:definition>
+	<rdfs:comment xml:lang="en-us">Examples include paintings, drawings, graphic designs, plans and maps. Recommended best practice is to assign the type Text to images of textual materials. Instances of the type Still Image must also be describable as instances of the broader type Image.</rdfs:comment>
+	<rdfs:subClassOf rdf:resource="http://purl.org/dc/dcmitype/Image"/>
+	<dcam:memberOf rdf:resource="http://purl.org/dc/terms/DCMIType"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/dc/dcmitype/Text">
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+	<rdfs:label xml:lang="en-us">Text</rdfs:label>
+	<skos:definition xml:lang="en-us">A resource consisting primarily of words for reading.</skos:definition>
+	<rdfs:comment xml:lang="en-us">Examples include books, letters, dissertations, poems, newspapers, articles, archives of mailing lists. Note that facsimiles or images of texts are still of the genre Text.</rdfs:comment>
+	<dcam:memberOf rdf:resource="http://purl.org/dc/terms/DCMIType"/>
+</rdf:Description>
+
+</rdf:RDF>
