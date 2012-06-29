@@ -72,7 +72,7 @@ public class AbstractSesameTest
      * @throws java.lang.Exception
      */
     @After
-    public void tearDown()
+    public void tearDown() throws Exception
     {
         if(this.testRepositoryConnection != null)
         {

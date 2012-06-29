@@ -42,7 +42,7 @@ public class GeneOntologyPropertyPathTest extends AbstractSesameTest
      * @see org.example.test.AbstractSesameTest#tearDown()
      */
     @After
-    public void tearDown()
+    public void tearDown() throws Exception
     {
         super.tearDown();
     }

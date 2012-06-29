@@ -1,0 +1,462 @@
+@prefix : <http://example.com/owl/families/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix otherOnt: <http://example.org/otherOntologies/families/> .
+
+<http://example.com/owl/families> a owl:Ontology ;
+	owl:imports <http://example.org/otherOntologies/families.owl> .
+
+:hasWife a owl:ObjectProperty ;
+	rdfs:subPropertyOf :hasSpouse ;
+	rdfs:domain :Man ;
+	rdfs:range :Woman .
+
+:hasParent a owl:ObjectProperty ;
+	owl:inverseOf :hasChild ;
+	owl:propertyDisjointWith :hasSpouse .
+
+:hasSon a owl:ObjectProperty ;
+	owl:propertyDisjointWith :hasDaughter .
+
+:hasFather a owl:ObjectProperty ;
+	rdfs:subPropertyOf :hasParent .
+
+:hasSpouse a owl:SymmetricProperty .
+
+:hasChild a owl:AsymmetricProperty .
+
+:hasRelative a owl:ReflexiveProperty .
+
+:parentOf a owl:IrreflexiveProperty .
+
+:hasHusband a owl:FunctionalProperty , owl:InverseFunctionalProperty .
+
+:hasAncestor a owl:TransitiveProperty .
+
+:hasGrandparent owl:propertyChainAxiom _:node170qvm1k0x1 .
+
+_:node170qvm1k0x1 rdf:first :hasParent ;
+	rdf:rest _:node170qvm1k0x2 .
+
+_:node170qvm1k0x2 rdf:first :hasParent ;
+	rdf:rest rdf:nil .
+
+:hasUncle owl:propertyChainAxiom _:node170qvm1k0x3 .
+
+_:node170qvm1k0x3 rdf:first :hasFather ;
+	rdf:rest _:node170qvm1k0x4 .
+
+_:node170qvm1k0x4 rdf:first :hasBrother .
+
+:hasBrother a owl:ObjectProperty .
+
+_:node170qvm1k0x4 rdf:rest rdf:nil .
+
+:hasAge a owl:DatatypeProperty ;
+	rdfs:domain :Person ;
+	rdfs:range _:node170qvm1k0x5 .
+
+_:node170qvm1k0x5 rdfs:Datatype "http://www.w3.org/2001/XMLSchema#nonNegativeInteger" .
+
+:hasAge owl:equivalentProperty otherOnt:age ;
+	a owl:FunctionalProperty .
+
+:Woman a owl:Class ;
+	rdfs:subClassOf :Person .
+
+:Mother a owl:Class ;
+	rdfs:subClassOf :Woman ;
+	owl:equivalentClass _:node170qvm1k0x6 .
+
+_:node170qvm1k0x6 a owl:Class ;
+	owl:intersectionOf _:node170qvm1k0x7 .
+
+_:node170qvm1k0x7 rdf:first :Woman ;
+	rdf:rest _:node170qvm1k0x8 .
+
+_:node170qvm1k0x8 rdf:first :Parent .
+
+:Parent a owl:Class .
+
+_:node170qvm1k0x8 rdf:rest rdf:nil .
+
+:Person a owl:Class ;
+	rdfs:comment "Represents the set of all people." ;
+	owl:equivalentClass :Human ;
+	owl:hasKey _:node170qvm1k0x9 .
+
+_:node170qvm1k0x9 rdf:first :hasSSN .
+
+:hasSSN a owl:ObjectProperty .
+
+_:node170qvm1k0x9 rdf:rest rdf:nil .
+
+:Parent owl:equivalentClass _:node170qvm1k0x10 .
+
+_:node170qvm1k0x10 a owl:Class ;
+	owl:unionOf _:node170qvm1k0x11 .
+
+_:node170qvm1k0x11 rdf:first :Mother ;
+	rdf:rest _:node170qvm1k0x12 .
+
+_:node170qvm1k0x12 rdf:first :Father .
+
+:Father a owl:Class .
+
+_:node170qvm1k0x12 rdf:rest rdf:nil .
+
+:Parent owl:equivalentClass _:node170qvm1k0x13 .
+
+_:node170qvm1k0x13 a owl:Restriction ;
+	owl:onProperty :hasChild ;
+	owl:someValuesFrom :Person .
+
+:ChildlessPerson a owl:Class ;
+	owl:equivalentClass _:node170qvm1k0x14 .
+
+_:node170qvm1k0x14 a owl:Class ;
+	owl:intersectionOf _:node170qvm1k0x15 .
+
+_:node170qvm1k0x15 rdf:first :Person ;
+	rdf:rest _:node170qvm1k0x17 .
+
+_:node170qvm1k0x17 rdf:first _:node170qvm1k0x16 .
+
+_:node170qvm1k0x16 a owl:Class ;
+	owl:complementOf :Parent .
+
+_:node170qvm1k0x17 rdf:rest rdf:nil .
+
+:Grandfather a owl:Class ;
+	rdfs:subClassOf _:node170qvm1k0x18 .
+
+_:node170qvm1k0x18 a owl:Class ;
+	owl:intersectionOf _:node170qvm1k0x19 .
+
+_:node170qvm1k0x19 rdf:first :Man .
+
+:Man a owl:Class .
+
+_:node170qvm1k0x19 rdf:rest _:node170qvm1k0x20 .
+
+_:node170qvm1k0x20 rdf:first :Parent ;
+	rdf:rest rdf:nil .
+
+:HappyPerson a owl:Class ;
+	owl:equivalentClass _:node170qvm1k0x21 .
+
+_:node170qvm1k0x21 a owl:Class ;
+	owl:intersectionOf _:node170qvm1k0x23 .
+
+_:node170qvm1k0x23 rdf:first _:node170qvm1k0x22 .
+
+_:node170qvm1k0x22 a owl:Restriction ;
+	owl:onProperty :hasChild ;
+	owl:allValuesFrom :HappyPerson .
+
+_:node170qvm1k0x23 rdf:rest _:node170qvm1k0x25 .
+
+_:node170qvm1k0x25 rdf:first _:node170qvm1k0x24 .
+
+_:node170qvm1k0x24 a owl:Restriction ;
+	owl:onProperty :hasChild ;
+	owl:someValuesFrom :HappyPerson .
+
+_:node170qvm1k0x25 rdf:rest rdf:nil .
+
+:JohnsChildren a owl:Class ;
+	owl:equivalentClass _:node170qvm1k0x26 .
+
+_:node170qvm1k0x26 a owl:Restriction ;
+	owl:onProperty :hasParent ;
+	owl:hasValue :John .
+
+:NarcisticPerson a owl:Class ;
+	owl:equivalentClass _:node170qvm1k0x27 .
+
+_:node170qvm1k0x27 a owl:Restriction ;
+	owl:onProperty :loves ;
+	owl:hasSelf "true"^^xsd:boolean .
+
+:MyBirthdayGuests a owl:Class ;
+	owl:equivalentClass _:node170qvm1k0x28 .
+
+_:node170qvm1k0x28 a owl:Class ;
+	owl:oneOf _:node170qvm1k0x29 .
+
+_:node170qvm1k0x29 rdf:first :Bill ;
+	rdf:rest _:node170qvm1k0x30 .
+
+_:node170qvm1k0x30 rdf:first :John ;
+	rdf:rest _:node170qvm1k0x31 .
+
+_:node170qvm1k0x31 rdf:first :Mary ;
+	rdf:rest rdf:nil .
+
+:Orphan a owl:Class ;
+	owl:equivalentClass _:node170qvm1k0x32 .
+
+_:node170qvm1k0x32 a owl:Restriction ;
+	owl:onProperty _:node170qvm1k0x33 .
+
+_:node170qvm1k0x33 a owl:ObjectProperty ;
+	owl:inverseOf :hasChild .
+
+_:node170qvm1k0x32 owl:Class :Dead .
+
+:Teenager a owl:Class ;
+	rdfs:subClassOf _:node170qvm1k0x34 .
+
+_:node170qvm1k0x34 a owl:Restriction ;
+	owl:onProperty :hasAge ;
+	owl:someValuesFrom _:node170qvm1k0x35 .
+
+_:node170qvm1k0x35 a rdfs:Datatype ;
+	owl:onDataType xsd:integer ;
+	owl:withRestrictions _:node170qvm1k0x37 .
+
+_:node170qvm1k0x37 rdf:first _:node170qvm1k0x36 .
+
+_:node170qvm1k0x36 xsd:minExclusive "12"^^xsd:integer .
+
+_:node170qvm1k0x37 rdf:rest _:node170qvm1k0x39 .
+
+_:node170qvm1k0x39 rdf:first _:node170qvm1k0x38 .
+
+_:node170qvm1k0x38 xsd:maxInclusive "19"^^xsd:integer .
+
+_:node170qvm1k0x39 rdf:rest rdf:nil .
+
+:Man rdfs:subClassOf :Person .
+
+_:node170qvm1k0x40 a owl:Axiom ;
+	owl:annotatedSource :Man ;
+	owl:annotatedProperty rdfs:subClassOf ;
+	owl:annotatedTarget :Person ;
+	rdfs:comment "States that every man is a person." .
+
+:Adult a owl:Class ;
+	owl:equivalentClass otherOnt:Grownup .
+
+:Father rdfs:subClassOf _:node170qvm1k0x41 .
+
+_:node170qvm1k0x41 a owl:Class ;
+	owl:intersectionOf _:node170qvm1k0x42 .
+
+_:node170qvm1k0x42 rdf:first :Man ;
+	rdf:rest _:node170qvm1k0x43 .
+
+_:node170qvm1k0x43 rdf:first :Parent ;
+	rdf:rest rdf:nil .
+
+:ChildlessPerson rdfs:subClassOf _:node170qvm1k0x44 .
+
+_:node170qvm1k0x44 a owl:Class ;
+	owl:intersectionOf _:node170qvm1k0x45 .
+
+_:node170qvm1k0x45 rdf:first :Person ;
+	rdf:rest _:node170qvm1k0x47 .
+
+_:node170qvm1k0x47 rdf:first _:node170qvm1k0x46 .
+
+_:node170qvm1k0x46 a owl:Class ;
+	owl:complementOf _:node170qvm1k0x48 .
+
+_:node170qvm1k0x48 a owl:Restriction ;
+	owl:onProperty _:node170qvm1k0x49 .
+
+_:node170qvm1k0x49 a owl:ObjectProperty ;
+	owl:inverseOf :hasParent .
+
+_:node170qvm1k0x48 owl:someValuesFrom owl:Thing .
+
+_:node170qvm1k0x47 rdf:rest rdf:nil .
+
+_:node170qvm1k0x50 a owl:Class ;
+	owl:intersectionOf _:node170qvm1k0x52 .
+
+_:node170qvm1k0x52 rdf:first _:node170qvm1k0x51 .
+
+_:node170qvm1k0x51 a owl:Class ;
+	owl:oneOf _:node170qvm1k0x53 .
+
+_:node170qvm1k0x53 rdf:first :Mary ;
+	rdf:rest _:node170qvm1k0x54 .
+
+_:node170qvm1k0x54 rdf:first :Bill ;
+	rdf:rest _:node170qvm1k0x55 .
+
+_:node170qvm1k0x55 rdf:first :Meg ;
+	rdf:rest rdf:nil .
+
+_:node170qvm1k0x52 rdf:rest _:node170qvm1k0x56 .
+
+_:node170qvm1k0x56 rdf:first :Female .
+
+:Female a owl:Class .
+
+_:node170qvm1k0x56 rdf:rest rdf:nil .
+
+_:node170qvm1k0x50 rdfs:subClassOf _:node170qvm1k0x57 .
+
+_:node170qvm1k0x57 a owl:Class ;
+	owl:intersectionOf _:node170qvm1k0x58 .
+
+_:node170qvm1k0x58 rdf:first :Parent ;
+	rdf:rest _:node170qvm1k0x60 .
+
+_:node170qvm1k0x60 rdf:first _:node170qvm1k0x59 .
+
+_:node170qvm1k0x59 a owl:Restriction ;
+	owl:maxCardinality "2"^^xsd:nonNegativeInteger ;
+	owl:onProperty :hasChild .
+
+_:node170qvm1k0x60 rdf:rest _:node170qvm1k0x62 .
+
+_:node170qvm1k0x62 rdf:first _:node170qvm1k0x61 .
+
+_:node170qvm1k0x61 a owl:Restriction ;
+	owl:onProperty :hasChild ;
+	owl:allValuesFrom :Female .
+
+_:node170qvm1k0x62 rdf:rest rdf:nil .
+
+_:node170qvm1k0x63 a owl:AllDisjointClasses ;
+	owl:members _:node170qvm1k0x64 .
+
+_:node170qvm1k0x64 rdf:first :Woman ;
+	rdf:rest _:node170qvm1k0x65 .
+
+_:node170qvm1k0x65 rdf:first :Man ;
+	rdf:rest rdf:nil .
+
+_:node170qvm1k0x66 a owl:AllDisjointClasses ;
+	owl:members _:node170qvm1k0x67 .
+
+_:node170qvm1k0x67 rdf:first :Mother ;
+	rdf:rest _:node170qvm1k0x68 .
+
+_:node170qvm1k0x68 rdf:first :Father ;
+	rdf:rest _:node170qvm1k0x69 .
+
+_:node170qvm1k0x69 rdf:first :YoungChild .
+
+:YoungChild a owl:Class .
+
+_:node170qvm1k0x69 rdf:rest rdf:nil .
+
+:personAge owl:equivalentClass _:node170qvm1k0x70 .
+
+_:node170qvm1k0x70 a rdfs:Datatype ;
+	owl:onDatatype xsd:integer ;
+	owl:withRestrictions _:node170qvm1k0x72 .
+
+_:node170qvm1k0x72 rdf:first _:node170qvm1k0x71 .
+
+_:node170qvm1k0x71 xsd:minInclusive "0"^^xsd:integer .
+
+_:node170qvm1k0x72 rdf:rest _:node170qvm1k0x74 .
+
+_:node170qvm1k0x74 rdf:first _:node170qvm1k0x73 .
+
+_:node170qvm1k0x73 xsd:maxInclusive "150"^^xsd:integer .
+
+_:node170qvm1k0x74 rdf:rest rdf:nil .
+
+:majorAge owl:equivalentClass _:node170qvm1k0x75 .
+
+_:node170qvm1k0x75 a rdfs:Datatype ;
+	owl:intersectionOf _:node170qvm1k0x76 .
+
+_:node170qvm1k0x76 rdf:first :personAge ;
+	rdf:rest _:node170qvm1k0x78 .
+
+_:node170qvm1k0x78 rdf:first _:node170qvm1k0x77 .
+
+_:node170qvm1k0x77 a rdfs:Datatype ;
+	owl:datatypeComplementOf :minorAge .
+
+_:node170qvm1k0x78 rdf:rest rdf:nil .
+
+:toddlerAge owl:equivalentClass _:node170qvm1k0x79 .
+
+_:node170qvm1k0x79 a rdfs:Datatype ;
+	owl:oneOf _:node170qvm1k0x80 .
+
+_:node170qvm1k0x80 rdf:first "1"^^xsd:integer ;
+	rdf:rest _:node170qvm1k0x81 .
+
+_:node170qvm1k0x81 rdf:first "2"^^xsd:integer ;
+	rdf:rest rdf:nil .
+
+:Mary a :Person , :Woman ;
+	owl:sameAs otherOnt:MaryBrown .
+
+:James a owl:NamedIndividual ;
+	owl:sameAs :Jim .
+
+:Jack a _:node170qvm1k0x82 .
+
+_:node170qvm1k0x82 a owl:Class ;
+	owl:intersectionOf _:node170qvm1k0x83 .
+
+_:node170qvm1k0x83 rdf:first :Person ;
+	rdf:rest _:node170qvm1k0x85 .
+
+_:node170qvm1k0x85 rdf:first _:node170qvm1k0x84 .
+
+_:node170qvm1k0x84 a owl:Class ;
+	owl:complementOf :Parent .
+
+_:node170qvm1k0x85 rdf:rest rdf:nil .
+
+:John a owl:NamedIndividual ;
+	:hasWife :Mary ;
+	:hasAge "51"^^xsd:integer ;
+	owl:differentFrom :Bill ;
+	owl:sameAs otherOnt:JohnBrown ;
+	a :Person , :Father , _:node170qvm1k0x86 .
+
+_:node170qvm1k0x86 a owl:Restriction ;
+	owl:maxQualifiedCardinality "4"^^xsd:nonNegativeInteger ;
+	owl:onProperty :hasChild ;
+	owl:onClass :Parent .
+
+:John a _:node170qvm1k0x87 .
+
+_:node170qvm1k0x87 a owl:Restriction ;
+	owl:minQualifiedCardinality "2"^^xsd:nonNegativeInteger ;
+	owl:onProperty :hasChild ;
+	owl:onClass :Parent .
+
+:John a _:node170qvm1k0x88 .
+
+_:node170qvm1k0x88 a owl:Restriction ;
+	owl:qualifiedCardinality "3"^^xsd:nonNegativeInteger ;
+	owl:onProperty :hasChild ;
+	owl:onClass :Parent .
+
+:John a _:node170qvm1k0x89 .
+
+_:node170qvm1k0x89 a owl:Restriction ;
+	owl:cardinality "5"^^xsd:nonNegativeInteger ;
+	owl:onProperty :hasChild .
+
+:Father a :SocialRole .
+
+_:node170qvm1k0x90 a owl:NegativePropertyAssertion ;
+	owl:sourceIndividual :Bill ;
+	owl:assertionProperty :hasWife ;
+	owl:targetIndividual :Mary .
+
+_:node170qvm1k0x91 a owl:NegativePropertyAssertion ;
+	owl:sourceIndividual :Jack ;
+	owl:assertionProperty :hasAge ;
+	owl:targetValue "53"^^xsd:integer .
+
+_:node170qvm1k0x92 a owl:NegativePropertyAssertion ;
+	owl:sourceIndividual :Bill ;
+	owl:assertionProperty :hasDaughter ;
+	owl:targetIndividual :Susan .
