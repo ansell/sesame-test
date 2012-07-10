@@ -138,4 +138,14 @@ public class TurtleBlankNodeParsingTest extends AbstractSesameTest
         
     }
     
+    @Test
+    public final void testTurtleBlankNodeParsing11() throws RDFParseException, RepositoryException, IOException
+    {
+        this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/testBlankNodes-11.ttl"), "",
+                RDFFormat.TURTLE);
+        
+        Assert.assertEquals(1, this.getTestRepositoryConnection().size());
+        
+    }
+    
 }
