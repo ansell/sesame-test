@@ -6,5 +6,6 @@
 [] <urn:P> 7 .
 [] <urn:P> "7" .
 [] <urn:P> "not a number" .
+[] <urn:P> "language literal"@fr .
 [] <urn:P> <urn:Q> .
 

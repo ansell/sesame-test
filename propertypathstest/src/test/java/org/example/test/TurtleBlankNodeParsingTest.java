@@ -44,7 +44,7 @@ public class TurtleBlankNodeParsingTest extends AbstractSesameTest
         this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/testBlankNodes.ttl"), "",
                 RDFFormat.TURTLE);
         
-        Assert.assertEquals(8, this.getTestRepositoryConnection().size());
+        Assert.assertEquals(9, this.getTestRepositoryConnection().size());
         
     }
     
