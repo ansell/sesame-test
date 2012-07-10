@@ -1,6 +1,10 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> . 
+[] <urn:P> "007"^^xsd:int .
 [] <urn:P> "007"^^<http://www.w3.org/2001/XMLSchema#int> .
 [] <urn:P> "007"^^<http://www.w3.org/2001/XMLSchema#integer> .
 [] <urn:P> "7"^^<http://www.w3.org/2001/XMLSchema#integer> .
 [] <urn:P> 7 .
+[] <urn:P> "7" .
+[] <urn:P> "not a number" .
+[] <urn:P> <urn:Q> .
 

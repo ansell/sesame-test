@@ -44,7 +44,7 @@ public class TurtleBlankNodeParsingTest extends AbstractSesameTest
         this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/testBlankNodes.ttl"), "",
                 RDFFormat.TURTLE);
         
-        Assert.assertEquals(4, this.getTestRepositoryConnection().size());
+        Assert.assertEquals(8, this.getTestRepositoryConnection().size());
         
     }
     
@@ -102,6 +102,36 @@ public class TurtleBlankNodeParsingTest extends AbstractSesameTest
     public final void testTurtleBlankNodeParsing7() throws RDFParseException, RepositoryException, IOException
     {
         this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/testBlankNodes-7.ttl"), "",
+                RDFFormat.TURTLE);
+        
+        Assert.assertEquals(1, this.getTestRepositoryConnection().size());
+        
+    }
+    
+    @Test
+    public final void testTurtleBlankNodeParsing8() throws RDFParseException, RepositoryException, IOException
+    {
+        this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/testBlankNodes-8.ttl"), "",
+                RDFFormat.TURTLE);
+        
+        Assert.assertEquals(1, this.getTestRepositoryConnection().size());
+        
+    }
+    
+    @Test
+    public final void testTurtleBlankNodeParsing9() throws RDFParseException, RepositoryException, IOException
+    {
+        this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/testBlankNodes-9.ttl"), "",
+                RDFFormat.TURTLE);
+        
+        Assert.assertEquals(1, this.getTestRepositoryConnection().size());
+        
+    }
+    
+    @Test
+    public final void testTurtleBlankNodeParsing10() throws RDFParseException, RepositoryException, IOException
+    {
+        this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/testBlankNodes-10.ttl"), "",
                 RDFFormat.TURTLE);
         
         Assert.assertEquals(1, this.getTestRepositoryConnection().size());
