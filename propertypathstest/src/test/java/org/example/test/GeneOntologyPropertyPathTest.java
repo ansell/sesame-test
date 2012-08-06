@@ -32,7 +32,7 @@ public class GeneOntologyPropertyPathTest extends AbstractSesameTest
     public void setUp() throws Exception
     {
         super.setUp();
-        
+
         this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/geneontologysample1.n3"), "http://test.example.org/", RDFFormat.N3);
         
         Assert.assertEquals(58053, this.getTestRepositoryConnection().size());
@@ -48,7 +48,7 @@ public class GeneOntologyPropertyPathTest extends AbstractSesameTest
     }
     
     @Test
-    public void testPropertyPathIsALengthFull() throws RepositoryException, MalformedQueryException, QueryEvaluationException
+    public void testGeneOntologyPropertyPathIsALengthFull() throws RepositoryException, MalformedQueryException, QueryEvaluationException
     {
         TupleQuery query = this.getTestRepositoryConnection().prepareTupleQuery(QueryLanguage.SPARQL, "select * where { <http://bio2rdf.org/go:0042254> <http://bio2rdf.org/ns/go#is_a>+ ?is_a . }");
         
