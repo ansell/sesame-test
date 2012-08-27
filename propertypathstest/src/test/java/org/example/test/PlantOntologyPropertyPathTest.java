@@ -37,6 +37,8 @@ public class PlantOntologyPropertyPathTest extends AbstractSesameTest
 
         this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/plant_ontology-v16.owl"), "http://test.example.org/", RDFFormat.RDFXML);
         
+        this.getTestRepositoryConnection().commit();
+        
         Assert.assertEquals(44284, this.getTestRepositoryConnection().size());
     }
     
