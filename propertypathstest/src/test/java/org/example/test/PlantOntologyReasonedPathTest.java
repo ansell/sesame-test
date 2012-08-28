@@ -16,6 +16,8 @@ import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.query.Binding;
 import org.openrdf.query.BindingSet;
+import org.openrdf.query.GraphQuery;
+import org.openrdf.query.GraphQueryResult;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.TupleQuery;
 import org.openrdf.query.TupleQueryResult;
@@ -313,6 +315,52 @@ public class PlantOntologyReasonedPathTest extends AbstractSesameTest
     
     @Test
     public final void testTriplesWithInferredSpecific() throws Exception
+    {
+        final GraphQuery query =
+                this.getTestRepositoryConnection()
+                        .prepareGraphQuery(
+                                QueryLanguage.SPARQL,
+                                "CONSTRUCT { ?parent <http://purl.org/oas/ontology#hasChildLink> ?child . } WHERE { ?child a <http://www.w3.org/2002/07/owl#Class> . ?parent a <http://www.w3.org/2002/07/owl#Class> . ?child <http://www.w3.org/2000/01/rdf-schema#subClassOf>+ ?parent . FILTER(isIRI(?child) && isIRI(?parent)) } ");
+        
+        final DatasetImpl testDataset = new DatasetImpl();
+        testDataset.addDefaultGraph(this.testContextUri);
+        testDataset.addDefaultGraph(this.testInferredContextUri);
+        
+        query.setDataset(testDataset);
+        
+        query.clearBindings();
+        query.setBinding("parent", this.getTestValueFactory().createURI("http://purl.obolibrary.org/obo/PO_0025215"));
+        
+        final GraphQueryResult queryResult = query.evaluate();
+        
+        final AtomicInteger bindingCount = new AtomicInteger(0);
+        
+        try
+        {
+            Assert.assertTrue(queryResult.hasNext());
+            
+            while(queryResult.hasNext())
+            {
+                final Statement statement = queryResult.next();
+                
+                bindingCount.incrementAndGet();
+                
+                if(this.log.isInfoEnabled())
+                {
+                    this.log.info("nextStatement: {}", statement);
+                }
+            }
+        }
+        finally
+        {
+            queryResult.close();
+        }
+        
+        Assert.assertEquals(20, bindingCount.get());
+    }
+    
+    @Test
+    public final void testTuplesWithInferredSpecific() throws Exception
     {
         final TupleQuery query =
                 this.getTestRepositoryConnection()
