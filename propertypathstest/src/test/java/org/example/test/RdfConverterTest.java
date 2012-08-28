@@ -25,7 +25,7 @@ public class RdfConverterTest
     private String testInputMimeType;
     private String testBaseURI;
     private String testOutputMimeType;
-
+    
     @Before
     public void setUp() throws Exception
     {
@@ -39,61 +39,64 @@ public class RdfConverterTest
     @Test
     public void testConvertDcAm() throws OpenRDFException, IOException
     {
-        testWriter = new StringWriter();
-        testFileName = "/dcam.ttl";
-        testInputMimeType = "text/turtle";
-        testBaseURI = "http://purl.org/NET/dc_owl2dl/dcam";
-        testOutputMimeType = "application/rdf+xml";
-        testInputStream = this.getClass().getResourceAsStream(testFileName);
+        this.testWriter = new StringWriter();
+        this.testFileName = "/dcam.ttl";
+        this.testInputMimeType = "text/turtle";
+        this.testBaseURI = "http://purl.org/NET/dc_owl2dl/dcam";
+        this.testOutputMimeType = "application/rdf+xml";
+        this.testInputStream = this.getClass().getResourceAsStream(this.testFileName);
         
-        Assert.assertNotNull(testInputStream);
+        Assert.assertNotNull(this.testInputStream);
         
-        RdfConverter.convert(testWriter, testInputStream, testFileName, testInputMimeType, testBaseURI, testOutputMimeType);
+        RdfConverter.convert(this.testWriter, this.testInputStream, this.testFileName, this.testInputMimeType,
+                this.testBaseURI, this.testOutputMimeType);
         
-        LOGGER.info("output=");
-        LOGGER.info(testWriter.toString());
-    }
-    
-    @Test
-    public void testConvertDcTermsOd() throws OpenRDFException, IOException
-    {
-        testWriter = new StringWriter();
-        testFileName = "/dcterms_od.ttl";
-        testInputMimeType = "text/turtle";
-        testBaseURI = "http://purl.org/NET/dc_owl2dl/terms_od";
-        testOutputMimeType = "application/rdf+xml";
-        testInputStream = this.getClass().getResourceAsStream(testFileName);
-        
-        Assert.assertNotNull(testInputStream);
-        
-        RdfConverter.convert(testWriter, testInputStream, testFileName, testInputMimeType, testBaseURI, testOutputMimeType);
-        
-        LOGGER.info("output=");
-        LOGGER.info(testWriter.toString());
+        RdfConverterTest.LOGGER.info("output=");
+        RdfConverterTest.LOGGER.info(this.testWriter.toString());
     }
     
     @Test
     public void testConvertDcmiType() throws OpenRDFException, IOException
     {
-        testWriter = new StringWriter();
-        testFileName = "/dcmitype.ttl";
-        testInputMimeType = "text/turtle";
-        testBaseURI = "http://purl.org/NET/dc_owl2dl/dcmitype";
-        testOutputMimeType = "application/rdf+xml";
-        testInputStream = this.getClass().getResourceAsStream(testFileName);
+        this.testWriter = new StringWriter();
+        this.testFileName = "/dcmitype.ttl";
+        this.testInputMimeType = "text/turtle";
+        this.testBaseURI = "http://purl.org/NET/dc_owl2dl/dcmitype";
+        this.testOutputMimeType = "application/rdf+xml";
+        this.testInputStream = this.getClass().getResourceAsStream(this.testFileName);
         
-        Assert.assertNotNull(testInputStream);
+        Assert.assertNotNull(this.testInputStream);
         
-        RdfConverter.convert(testWriter, testInputStream, testFileName, testInputMimeType, testBaseURI, testOutputMimeType);
+        RdfConverter.convert(this.testWriter, this.testInputStream, this.testFileName, this.testInputMimeType,
+                this.testBaseURI, this.testOutputMimeType);
         
-        LOGGER.info("output=");
-        LOGGER.info(testWriter.toString());
+        RdfConverterTest.LOGGER.info("output=");
+        RdfConverterTest.LOGGER.info(this.testWriter.toString());
+    }
+    
+    @Test
+    public void testConvertDcTermsOd() throws OpenRDFException, IOException
+    {
+        this.testWriter = new StringWriter();
+        this.testFileName = "/dcterms_od.ttl";
+        this.testInputMimeType = "text/turtle";
+        this.testBaseURI = "http://purl.org/NET/dc_owl2dl/terms_od";
+        this.testOutputMimeType = "application/rdf+xml";
+        this.testInputStream = this.getClass().getResourceAsStream(this.testFileName);
+        
+        Assert.assertNotNull(this.testInputStream);
+        
+        RdfConverter.convert(this.testWriter, this.testInputStream, this.testFileName, this.testInputMimeType,
+                this.testBaseURI, this.testOutputMimeType);
+        
+        RdfConverterTest.LOGGER.info("output=");
+        RdfConverterTest.LOGGER.info(this.testWriter.toString());
     }
     
     @Test
     public void testOntologyCompiler() throws Exception
     {
-        List<String> argsList = new ArrayList<String>();
+        final List<String> argsList = new ArrayList<String>();
         
         argsList.add("-j");
         argsList.add("target/scufl2-ontology.jar");
@@ -106,9 +109,10 @@ public class RdfConverterTest
         org.openrdf.repository.object.compiler.Compiler.main(argsList.toArray(new String[argsList.size()]));
         
         // Bug traced to line 103 of OntologyLoader.followImports in alibaba-2.0-beta14
-        //              if (!model.contains(null, null, null, uri)) {
+        // if (!model.contains(null, null, null, uri)) {
         // should be
-        //              if (!model.contains(null, null, null, uri) && !model.contains(uri, RDF.TYPE, OWL.ONTOLOGY)) {
+        // if (!model.contains(null, null, null, uri) && !model.contains(uri, RDF.TYPE,
+        // OWL.ONTOLOGY)) {
         //
         // See bug report at: http://www.openrdf.org/issues/browse/ALI-13
     }

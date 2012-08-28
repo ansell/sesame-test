@@ -3,9 +3,8 @@
  */
 package org.example.test;
 
-import org.junit.Assert;
-
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.query.Binding;
@@ -20,27 +19,34 @@ import org.openrdf.rio.RDFFormat;
 
 /**
  * @author Peter Ansell p_ansell@yahoo.com
- *
+ * 
  */
 public class GeneOntologyPropertyPathTest extends AbstractSesameTest
 {
     
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.example.test.AbstractSesameTest#setUp()
      */
+    @Override
     @Before
     public void setUp() throws Exception
     {
         super.setUp();
-
-        this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/geneontologysample1.n3"), "http://test.example.org/", RDFFormat.N3);
+        
+        this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/geneontologysample1.n3"),
+                "http://test.example.org/", RDFFormat.N3);
         
         Assert.assertEquals(58053, this.getTestRepositoryConnection().size());
     }
     
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.example.test.AbstractSesameTest#tearDown()
      */
+    @Override
     @After
     public void tearDown() throws Exception
     {
@@ -48,11 +54,14 @@ public class GeneOntologyPropertyPathTest extends AbstractSesameTest
     }
     
     @Test
-    public void testGeneOntologyPropertyPathIsALengthFull() throws RepositoryException, MalformedQueryException, QueryEvaluationException
+    public void testGeneOntologyPropertyPathIsALengthFull() throws RepositoryException, MalformedQueryException,
+        QueryEvaluationException
     {
-        TupleQuery query = this.getTestRepositoryConnection().prepareTupleQuery(QueryLanguage.SPARQL, "select * where { <http://bio2rdf.org/go:0042254> <http://bio2rdf.org/ns/go#is_a>+ ?is_a . }");
+        final TupleQuery query =
+                this.getTestRepositoryConnection().prepareTupleQuery(QueryLanguage.SPARQL,
+                        "select * where { <http://bio2rdf.org/go:0042254> <http://bio2rdf.org/ns/go#is_a>+ ?is_a . }");
         
-        TupleQueryResult queryResult = query.evaluate();
+        final TupleQueryResult queryResult = query.evaluate();
         
         Assert.assertTrue(queryResult.hasNext());
         
@@ -60,12 +69,13 @@ public class GeneOntologyPropertyPathTest extends AbstractSesameTest
         
         while(queryResult.hasNext())
         {
-            BindingSet bindingSet = queryResult.next();
+            final BindingSet bindingSet = queryResult.next();
             bindingCount++;
             
-            for(Binding nextBinding : bindingSet)
+            for(final Binding nextBinding : bindingSet)
             {
-                log.info("nextBinding name="+nextBinding.getName()+" value="+nextBinding.getValue().stringValue());
+                this.log.info("nextBinding name=" + nextBinding.getName() + " value="
+                        + nextBinding.getValue().stringValue());
             }
         }
         

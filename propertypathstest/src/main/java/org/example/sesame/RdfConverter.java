@@ -11,7 +11,9 @@ import org.openrdf.rio.Rio;
 
 public class RdfConverter
 {
-    public static void convert(Writer writer, InputStream inputStream, String fileName, String inputMimeType, String baseURI, String outputMimeType) throws OpenRDFException, IOException
+    public static void convert(final Writer writer, final InputStream inputStream, final String fileName,
+            final String inputMimeType, final String baseURI, final String outputMimeType) throws OpenRDFException,
+        IOException
     {
         RDFFormat rdfFormat = RDFFormat.RDFXML;
         if(inputMimeType != null)
@@ -23,17 +25,17 @@ public class RdfConverter
             rdfFormat = Rio.getParserFormatForFileName(fileName, RDFFormat.RDFXML);
         }
         
-        RDFParser createParser = Rio.createParser(rdfFormat);
+        final RDFParser createParser = Rio.createParser(rdfFormat);
         
-        
-        createParser.setRDFHandler(Rio.createWriter(Rio.getWriterFormatForMIMEType(outputMimeType, RDFFormat.RDFXML), writer));
+        createParser.setRDFHandler(Rio.createWriter(Rio.getWriterFormatForMIMEType(outputMimeType, RDFFormat.RDFXML),
+                writer));
         createParser.parse(inputStream, baseURI);
     }
     
     /**
      * @param args
      */
-    public static void main(String[] args)
+    public static void main(final String[] args)
     {
         
     }

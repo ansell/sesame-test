@@ -53,6 +53,7 @@ public class PlantOntologyReasonedPathTest extends AbstractSesameTest
     
     private URI testContextUri;
     private URI testInferredContextUri;
+    
     private OWLClass phylomeStomatalComplex;
     private OWLClass bractStomatalComplex;
     private OWLClass plantAnatomicalEntity;
@@ -118,12 +119,12 @@ public class PlantOntologyReasonedPathTest extends AbstractSesameTest
         
         Assert.assertEquals(2994, this.getTestRepositoryConnection().size(this.testInferredContextUri));
         
-        if(AbstractSesameTest.log.isTraceEnabled())
+        if(this.log.isTraceEnabled())
         {
             for(final Statement nextStatement : this.getTestRepositoryConnection()
                     .getStatements(null, null, null, true, this.testInferredContextUri).asList())
             {
-                AbstractSesameTest.log.trace(nextStatement.toString());
+                this.log.trace(nextStatement.toString());
             }
         }
     }
@@ -191,7 +192,7 @@ public class PlantOntologyReasonedPathTest extends AbstractSesameTest
                 this.getTestRepositoryConnection()
                         .prepareTupleQuery(
                                 QueryLanguage.SPARQL,
-                                "SELECT ?parent (COUNT(?child) AS ?childCount) WHERE { ?parent a <http://www.w3.org/2002/07/owl#Class> . ?parent <http://www.w3.org/2000/01/rdf-schema#subClassOf>+ ?child . } GROUP BY ?parent");
+                                "SELECT ?parent (COUNT(?child) AS ?childCount) WHERE { ?parent a <http://www.w3.org/2002/07/owl#Class> . ?parent <http://www.w3.org/2000/01/rdf-schema#subClassOf>+ ?child . FILTER(isIRI(?child) && isIRI(?parent)) } GROUP BY ?parent");
         
         final DatasetImpl testDataset = new DatasetImpl();
         testDataset.addDefaultGraph(this.testContextUri);
@@ -214,7 +215,7 @@ public class PlantOntologyReasonedPathTest extends AbstractSesameTest
                 
                 for(final Binding nextBinding : bindingSet)
                 {
-                    AbstractSesameTest.log.info("nextBinding name=" + nextBinding.getName() + " value="
+                    this.log.info("nextBinding name=" + nextBinding.getName() + " value="
                             + nextBinding.getValue().stringValue());
                 }
             }
@@ -234,7 +235,7 @@ public class PlantOntologyReasonedPathTest extends AbstractSesameTest
                 this.getTestRepositoryConnection()
                         .prepareTupleQuery(
                                 QueryLanguage.SPARQL,
-                                "SELECT ?parent (COUNT(?child) AS ?childCount) WHERE { ?parent a <http://www.w3.org/2002/07/owl#Class> . ?parent <http://www.w3.org/2000/01/rdf-schema#subClassOf>+ ?child . } GROUP BY ?parent");
+                                "SELECT ?parent (COUNT(?child) AS ?childCount) WHERE { ?parent a <http://www.w3.org/2002/07/owl#Class> . ?parent <http://www.w3.org/2000/01/rdf-schema#subClassOf>+ ?child . FILTER(isIRI(?child) && isIRI(?parent)) } GROUP BY ?parent");
         
         final DatasetImpl testDataset = new DatasetImpl();
         testDataset.addDefaultGraph(this.testContextUri);
@@ -259,7 +260,7 @@ public class PlantOntologyReasonedPathTest extends AbstractSesameTest
                 
                 final Literal value = (Literal)bindingSet.getBinding("childCount").getValue();
                 
-                Assert.assertEquals(28, value.intValue());
+                Assert.assertEquals(20, value.intValue());
                 
                 Assert.assertFalse("Should only have been one result binding", queryResult.hasNext());
             }
@@ -311,13 +312,63 @@ public class PlantOntologyReasonedPathTest extends AbstractSesameTest
     }
     
     @Test
+    public final void testTriplesWithInferredSpecific() throws Exception
+    {
+        final TupleQuery query =
+                this.getTestRepositoryConnection()
+                        .prepareTupleQuery(
+                                QueryLanguage.SPARQL,
+                                "SELECT ?parent ?child WHERE { ?parent a <http://www.w3.org/2002/07/owl#Class> . ?parent <http://www.w3.org/2000/01/rdf-schema#subClassOf>+ ?child . FILTER(isIRI(?child) && isIRI(?parent)) } ");
+        
+        final DatasetImpl testDataset = new DatasetImpl();
+        testDataset.addDefaultGraph(this.testContextUri);
+        testDataset.addDefaultGraph(this.testInferredContextUri);
+        
+        query.setDataset(testDataset);
+        
+        query.clearBindings();
+        query.setBinding("parent", this.getTestValueFactory().createURI("http://purl.obolibrary.org/obo/PO_0025215"));
+        
+        final TupleQueryResult queryResult = query.evaluate();
+        
+        final AtomicInteger bindingCount = new AtomicInteger(0);
+        
+        try
+        {
+            Assert.assertTrue(queryResult.hasNext());
+            
+            while(queryResult.hasNext())
+            {
+                final BindingSet bindingSet = queryResult.next();
+                
+                bindingCount.incrementAndGet();
+                
+                if(this.log.isInfoEnabled())
+                {
+                    for(final Binding nextBinding : bindingSet)
+                    {
+                        this.log.info("nextBinding name=" + nextBinding.getName() + " value="
+                                + nextBinding.getValue().stringValue());
+                    }
+                }
+            }
+        }
+        finally
+        {
+            queryResult.close();
+        }
+        
+        Assert.assertEquals(20, bindingCount.get());
+    }
+    
+    @Test
     public final void testWithInferred() throws Exception
     {
         final TupleQuery query =
                 this.getTestRepositoryConnection()
                         .prepareTupleQuery(
                                 QueryLanguage.SPARQL,
-                                "SELECT ?class ?subclassof WHERE { ?class a <http://www.w3.org/2002/07/owl#Class> . ?class <http://www.w3.org/2000/01/rdf-schema#subClassOf>+ ?subclassof . }");
+                                "SELECT ?class ?subclassof WHERE { ?class a <http://www.w3.org/2002/07/owl#Class> . ?class <http://www.w3.org/2000/01/rdf-schema#subClassOf>+ ?subclassof . FILTER(isIRI(?class) && isIRI(?subclassof)) }");
         
         final DatasetImpl testDataset = new DatasetImpl();
         testDataset.addDefaultGraph(this.testContextUri);
@@ -338,11 +389,11 @@ public class PlantOntologyReasonedPathTest extends AbstractSesameTest
                 final BindingSet bindingSet = queryResult.next();
                 bindingCount.incrementAndGet();
                 
-                if(AbstractSesameTest.log.isTraceEnabled())
+                if(this.log.isTraceEnabled())
                 {
                     for(final Binding nextBinding : bindingSet)
                     {
-                        AbstractSesameTest.log.trace("nextBinding name=" + nextBinding.getName() + " value="
+                        this.log.trace("nextBinding name=" + nextBinding.getName() + " value="
                                 + nextBinding.getValue().stringValue());
                     }
                 }
@@ -353,7 +404,7 @@ public class PlantOntologyReasonedPathTest extends AbstractSesameTest
             queryResult.close();
         }
         
-        Assert.assertEquals(23702, bindingCount.get());
+        Assert.assertEquals(18832, bindingCount.get());
     }
     
     @Test
@@ -363,7 +414,7 @@ public class PlantOntologyReasonedPathTest extends AbstractSesameTest
                 this.getTestRepositoryConnection()
                         .prepareTupleQuery(
                                 QueryLanguage.SPARQL,
-                                "SELECT ?class ?subclassof WHERE { ?class a <http://www.w3.org/2002/07/owl#Class> . ?class <http://www.w3.org/2000/01/rdf-schema#subClassOf>+ ?subclassof . }");
+                                "SELECT ?class ?subclassof WHERE { ?class a <http://www.w3.org/2002/07/owl#Class> . ?class <http://www.w3.org/2000/01/rdf-schema#subClassOf>+ ?subclassof . FILTER(isIRI(?class) && isIRI(?subclassof)) }");
         
         // test with a dataset that does not contain the inferred statements context
         final DatasetImpl testDataset = new DatasetImpl();
@@ -384,11 +435,11 @@ public class PlantOntologyReasonedPathTest extends AbstractSesameTest
                 final BindingSet bindingSet = queryResult.next();
                 bindingCount.incrementAndGet();
                 
-                if(AbstractSesameTest.log.isTraceEnabled())
+                if(this.log.isTraceEnabled())
                 {
                     for(final Binding nextBinding : bindingSet)
                     {
-                        AbstractSesameTest.log.trace("nextBinding name=" + nextBinding.getName() + " value="
+                        this.log.trace("nextBinding name=" + nextBinding.getName() + " value="
                                 + nextBinding.getValue().stringValue());
                     }
                 }
@@ -399,7 +450,7 @@ public class PlantOntologyReasonedPathTest extends AbstractSesameTest
             queryResult.close();
         }
         
-        Assert.assertEquals(9003, bindingCount.get());
+        Assert.assertEquals(6568, bindingCount.get());
     }
     
 }

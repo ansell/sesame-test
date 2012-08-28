@@ -15,23 +15,29 @@ import org.openrdf.rio.RDFParseException;
 
 /**
  * @author Peter Ansell p_ansell@yahoo.com
- *
+ * 
  */
 public class TurtleBlankNodeParsingTest extends AbstractSesameTest
 {
     
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.example.test.AbstractSesameTest#setUp()
      */
+    @Override
     @Before
     public void setUp() throws Exception
     {
         super.setUp();
     }
     
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.example.test.AbstractSesameTest#tearDown()
      */
+    @Override
     @After
     public void tearDown() throws Exception
     {
@@ -45,6 +51,26 @@ public class TurtleBlankNodeParsingTest extends AbstractSesameTest
                 RDFFormat.TURTLE);
         
         Assert.assertEquals(9, this.getTestRepositoryConnection().size());
+        
+    }
+    
+    @Test
+    public final void testTurtleBlankNodeParsing10() throws RDFParseException, RepositoryException, IOException
+    {
+        this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/testBlankNodes-10.ttl"), "",
+                RDFFormat.TURTLE);
+        
+        Assert.assertEquals(1, this.getTestRepositoryConnection().size());
+        
+    }
+    
+    @Test
+    public final void testTurtleBlankNodeParsing11() throws RDFParseException, RepositoryException, IOException
+    {
+        this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/testBlankNodes-11.ttl"), "",
+                RDFFormat.TURTLE);
+        
+        Assert.assertEquals(1, this.getTestRepositoryConnection().size());
         
     }
     
@@ -122,26 +148,6 @@ public class TurtleBlankNodeParsingTest extends AbstractSesameTest
     public final void testTurtleBlankNodeParsing9() throws RDFParseException, RepositoryException, IOException
     {
         this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/testBlankNodes-9.ttl"), "",
-                RDFFormat.TURTLE);
-        
-        Assert.assertEquals(1, this.getTestRepositoryConnection().size());
-        
-    }
-    
-    @Test
-    public final void testTurtleBlankNodeParsing10() throws RDFParseException, RepositoryException, IOException
-    {
-        this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/testBlankNodes-10.ttl"), "",
-                RDFFormat.TURTLE);
-        
-        Assert.assertEquals(1, this.getTestRepositoryConnection().size());
-        
-    }
-    
-    @Test
-    public final void testTurtleBlankNodeParsing11() throws RDFParseException, RepositoryException, IOException
-    {
-        this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/testBlankNodes-11.ttl"), "",
                 RDFFormat.TURTLE);
         
         Assert.assertEquals(1, this.getTestRepositoryConnection().size());

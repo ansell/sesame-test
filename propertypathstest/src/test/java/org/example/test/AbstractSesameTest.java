@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
  */
 public class AbstractSesameTest
 {
-    protected static Logger log = LoggerFactory.getLogger(AbstractSesameTest.class);
+    protected Logger log = LoggerFactory.getLogger(this.getClass());
     
     private Repository testRepository;
     
@@ -82,7 +82,7 @@ public class AbstractSesameTest
             }
             catch(final RepositoryException e)
             {
-                AbstractSesameTest.log.error("Test repository connection could not be closed", e);
+                this.log.error("Test repository connection could not be closed", e);
             }
         }
         
@@ -98,7 +98,7 @@ public class AbstractSesameTest
             }
             catch(final RepositoryException e)
             {
-                AbstractSesameTest.log.error("Test repository could not be shutdown", e);
+                this.log.error("Test repository could not be shutdown", e);
             }
         }
         
