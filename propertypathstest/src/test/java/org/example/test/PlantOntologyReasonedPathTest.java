@@ -12,9 +12,11 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.openrdf.model.Literal;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
+import org.openrdf.model.Value;
 import org.openrdf.query.Binding;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.Dataset;
@@ -80,6 +82,9 @@ public class PlantOntologyReasonedPathTest extends AbstractSesameTest
         String reasonerName = "Pellet";
         OWLReasonerFactory configuredReasoner =
                 OWLReasonerFactoryRegistry.getInstance().getReasonerFactory(reasonerName);
+        
+        assertNotNull("Could not find reasoner", configuredReasoner);
+        
         OWLReasoner reasoner = configuredReasoner.createReasoner(parsedOntology);
         assertTrue("Ontology was not consistent", reasoner.isConsistent());
         
@@ -124,7 +129,7 @@ public class PlantOntologyReasonedPathTest extends AbstractSesameTest
                 this.getTestRepositoryConnection()
                         .prepareTupleQuery(
                                 QueryLanguage.SPARQL,
-                                "select ?class ?subclassof where { ?class a <http://www.w3.org/2002/07/owl#Class> . ?class <http://www.w3.org/2000/01/rdf-schema#subClassOf>+ ?subclassof . }");
+                                "SELECT ?class ?subclassof WHERE { ?class a <http://www.w3.org/2002/07/owl#Class> . ?class <http://www.w3.org/2000/01/rdf-schema#subClassOf>+ ?subclassof . }");
         
         DatasetImpl testDataset = new DatasetImpl();
         testDataset.addDefaultGraph(testContextUri);
@@ -164,13 +169,99 @@ public class PlantOntologyReasonedPathTest extends AbstractSesameTest
     }
     
     @Test
+    public final void testCountWithInferred() throws Exception
+    {
+        TupleQuery query =
+                this.getTestRepositoryConnection()
+                        .prepareTupleQuery(
+                                QueryLanguage.SPARQL,
+                                "SELECT ?parent (COUNT(?child) AS ?childCount) WHERE { ?parent a <http://www.w3.org/2002/07/owl#Class> . ?parent <http://www.w3.org/2000/01/rdf-schema#subClassOf>+ ?child . } GROUP BY ?parent");
+        
+        DatasetImpl testDataset = new DatasetImpl();
+        testDataset.addDefaultGraph(testContextUri);
+        testDataset.addDefaultGraph(testInferredContextUri);
+        
+        query.setDataset(testDataset);
+        
+        TupleQueryResult queryResult = query.evaluate();
+        
+        AtomicInteger bindingCount = new AtomicInteger(0);
+        
+        try
+        {
+            Assert.assertTrue(queryResult.hasNext());
+            
+            while(queryResult.hasNext())
+            {
+                BindingSet bindingSet = queryResult.next();
+                bindingCount.incrementAndGet();
+                
+                for(Binding nextBinding : bindingSet)
+                {
+                    log.info("nextBinding name=" + nextBinding.getName() + " value="
+                            + nextBinding.getValue().stringValue());
+                }
+            }
+        }
+        finally
+        {
+            queryResult.close();
+        }
+        
+        Assert.assertEquals(1448, bindingCount.get());
+    }
+    
+    @Test
+    public final void testCountWithInferredSpecific() throws Exception
+    {
+        TupleQuery query =
+                this.getTestRepositoryConnection()
+                        .prepareTupleQuery(
+                                QueryLanguage.SPARQL,
+                                "SELECT ?parent (COUNT(?child) AS ?childCount) WHERE { ?parent a <http://www.w3.org/2002/07/owl#Class> . ?parent <http://www.w3.org/2000/01/rdf-schema#subClassOf>+ ?child . } GROUP BY ?parent");
+        
+        DatasetImpl testDataset = new DatasetImpl();
+        testDataset.addDefaultGraph(testContextUri);
+        testDataset.addDefaultGraph(testInferredContextUri);
+        
+        query.setDataset(testDataset);
+        
+        query.clearBindings();
+        query.setBinding("parent", this.getTestValueFactory().createURI("http://purl.obolibrary.org/obo/PO_0025215"));
+        
+        TupleQueryResult queryResult = query.evaluate();
+        
+        try
+        {
+            Assert.assertTrue(queryResult.hasNext());
+            
+            while(queryResult.hasNext())
+            {
+                BindingSet bindingSet = queryResult.next();
+                
+                assertTrue(bindingSet.hasBinding("childCount"));
+                
+                Literal value = (Literal)bindingSet.getBinding("childCount").getValue();
+                
+                assertEquals(28, value.intValue());
+                
+                Assert.assertFalse("Should only have been one result binding", queryResult.hasNext());
+            }
+        }
+        finally
+        {
+            queryResult.close();
+        }
+    }
+    
+    @Test
     public final void testWithoutInferred() throws Exception
     {
         TupleQuery query =
                 this.getTestRepositoryConnection()
                         .prepareTupleQuery(
                                 QueryLanguage.SPARQL,
-                                "select ?class ?subclassof where { ?class a <http://www.w3.org/2002/07/owl#Class> . ?class <http://www.w3.org/2000/01/rdf-schema#subClassOf>+ ?subclassof . }");
+                                "SELECT ?class ?subclassof WHERE { ?class a <http://www.w3.org/2002/07/owl#Class> . ?class <http://www.w3.org/2000/01/rdf-schema#subClassOf>+ ?subclassof . }");
         
         // test with a dataset that does not contain the inferred statements context
         DatasetImpl testDataset = new DatasetImpl();
