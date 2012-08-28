@@ -4,6 +4,7 @@
 package org.example.test;
 
 import java.io.PrintWriter;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -231,6 +232,49 @@ public class PlantOntologyReasonedPathTest extends AbstractSesameTest
     }
     
     @Test
+    public final void testCountWithInferredDistinct() throws Exception
+    {
+        final TupleQuery query =
+                this.getTestRepositoryConnection()
+                        .prepareTupleQuery(
+                                QueryLanguage.SPARQL,
+                                "SELECT DISTINCT ?parent (COUNT(DISTINCT ?child) AS ?childCount) WHERE { ?parent a <http://www.w3.org/2002/07/owl#Class> . ?parent <http://www.w3.org/2000/01/rdf-schema#subClassOf>+ ?child . FILTER(isIRI(?child) && isIRI(?parent)) } GROUP BY ?parent");
+        
+        final DatasetImpl testDataset = new DatasetImpl();
+        testDataset.addDefaultGraph(this.testContextUri);
+        testDataset.addDefaultGraph(this.testInferredContextUri);
+        
+        query.setDataset(testDataset);
+        
+        final TupleQueryResult queryResult = query.evaluate();
+        
+        final AtomicInteger bindingCount = new AtomicInteger(0);
+        
+        try
+        {
+            Assert.assertTrue(queryResult.hasNext());
+            
+            while(queryResult.hasNext())
+            {
+                final BindingSet bindingSet = queryResult.next();
+                bindingCount.incrementAndGet();
+                
+                for(final Binding nextBinding : bindingSet)
+                {
+                    this.log.info("nextBinding name=" + nextBinding.getName() + " value="
+                            + nextBinding.getValue().stringValue());
+                }
+            }
+        }
+        finally
+        {
+            queryResult.close();
+        }
+        
+        Assert.assertEquals(1448, bindingCount.get());
+    }
+    
+    @Test
     public final void testCountWithInferredSpecific() throws Exception
     {
         final TupleQuery query =
@@ -263,6 +307,49 @@ public class PlantOntologyReasonedPathTest extends AbstractSesameTest
                 final Literal value = (Literal)bindingSet.getBinding("childCount").getValue();
                 
                 Assert.assertEquals(20, value.intValue());
+                
+                Assert.assertFalse("Should only have been one result binding", queryResult.hasNext());
+            }
+        }
+        finally
+        {
+            queryResult.close();
+        }
+    }
+    
+    @Test
+    public final void testCountWithInferredSpecificDistinct() throws Exception
+    {
+        final TupleQuery query =
+                this.getTestRepositoryConnection()
+                        .prepareTupleQuery(
+                                QueryLanguage.SPARQL,
+                                "SELECT DISTINCT ?parent (COUNT(DISTINCT ?child) AS ?childCount) WHERE { ?parent a <http://www.w3.org/2002/07/owl#Class> . ?parent <http://www.w3.org/2000/01/rdf-schema#subClassOf>+ ?child . FILTER(isIRI(?child) && isIRI(?parent)) } GROUP BY ?parent");
+        
+        final DatasetImpl testDataset = new DatasetImpl();
+        testDataset.addDefaultGraph(this.testContextUri);
+        testDataset.addDefaultGraph(this.testInferredContextUri);
+        
+        query.setDataset(testDataset);
+        
+        query.clearBindings();
+        query.setBinding("parent", this.getTestValueFactory().createURI("http://purl.obolibrary.org/obo/PO_0025215"));
+        
+        final TupleQueryResult queryResult = query.evaluate();
+        
+        try
+        {
+            Assert.assertTrue(queryResult.hasNext());
+            
+            while(queryResult.hasNext())
+            {
+                final BindingSet bindingSet = queryResult.next();
+                
+                Assert.assertTrue(bindingSet.hasBinding("childCount"));
+                
+                final Literal value = (Literal)bindingSet.getBinding("childCount").getValue();
+                
+                Assert.assertEquals(8, value.intValue());
                 
                 Assert.assertFalse("Should only have been one result binding", queryResult.hasNext());
             }
@@ -333,7 +420,7 @@ public class PlantOntologyReasonedPathTest extends AbstractSesameTest
         
         final GraphQueryResult queryResult = query.evaluate();
         
-        final AtomicInteger bindingCount = new AtomicInteger(0);
+        final Set<Statement> resultStatements = new LinkedHashSet<Statement>();
         
         try
         {
@@ -343,11 +430,13 @@ public class PlantOntologyReasonedPathTest extends AbstractSesameTest
             {
                 final Statement statement = queryResult.next();
                 
-                bindingCount.incrementAndGet();
-                
-                if(this.log.isInfoEnabled())
+                if(resultStatements.add(statement))
                 {
                     this.log.info("nextStatement: {}", statement);
+                }
+                else
+                {
+                    this.log.info("Ignored duplicate statement: {}", statement);
                 }
             }
         }
@@ -356,7 +445,7 @@ public class PlantOntologyReasonedPathTest extends AbstractSesameTest
             queryResult.close();
         }
         
-        Assert.assertEquals(20, bindingCount.get());
+        Assert.assertEquals(11, resultStatements.size());
     }
     
     @Test
@@ -407,6 +496,56 @@ public class PlantOntologyReasonedPathTest extends AbstractSesameTest
         }
         
         Assert.assertEquals(20, bindingCount.get());
+    }
+    
+    @Test
+    public final void testTuplesWithInferredSpecificDistinct() throws Exception
+    {
+        final TupleQuery query =
+                this.getTestRepositoryConnection()
+                        .prepareTupleQuery(
+                                QueryLanguage.SPARQL,
+                                "SELECT DISTINCT ?parent ?child WHERE { ?parent a <http://www.w3.org/2002/07/owl#Class> . ?parent <http://www.w3.org/2000/01/rdf-schema#subClassOf>+ ?child . FILTER(isIRI(?child) && isIRI(?parent)) } ");
+        
+        final DatasetImpl testDataset = new DatasetImpl();
+        testDataset.addDefaultGraph(this.testContextUri);
+        testDataset.addDefaultGraph(this.testInferredContextUri);
+        
+        query.setDataset(testDataset);
+        
+        query.clearBindings();
+        query.setBinding("parent", this.getTestValueFactory().createURI("http://purl.obolibrary.org/obo/PO_0025215"));
+        
+        final TupleQueryResult queryResult = query.evaluate();
+        
+        final AtomicInteger bindingCount = new AtomicInteger(0);
+        
+        try
+        {
+            Assert.assertTrue(queryResult.hasNext());
+            
+            while(queryResult.hasNext())
+            {
+                final BindingSet bindingSet = queryResult.next();
+                
+                bindingCount.incrementAndGet();
+                
+                if(this.log.isInfoEnabled())
+                {
+                    for(final Binding nextBinding : bindingSet)
+                    {
+                        this.log.info("nextBinding name=" + nextBinding.getName() + " value="
+                                + nextBinding.getValue().stringValue());
+                    }
+                }
+            }
+        }
+        finally
+        {
+            queryResult.close();
+        }
+        
+        Assert.assertEquals(8, bindingCount.get());
     }
     
     @Test
