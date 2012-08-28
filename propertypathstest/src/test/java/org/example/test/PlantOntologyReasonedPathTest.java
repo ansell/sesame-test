@@ -53,6 +53,10 @@ public class PlantOntologyReasonedPathTest extends AbstractSesameTest
     
     private URI testContextUri;
     private URI testInferredContextUri;
+    private OWLClass phylomeStomatalComplex;
+    private OWLClass bractStomatalComplex;
+    private OWLClass plantAnatomicalEntity;
+    private OWLClass phylome;
     
     /**
      * @throws java.lang.Exception
@@ -62,6 +66,11 @@ public class PlantOntologyReasonedPathTest extends AbstractSesameTest
     public void setUp() throws Exception
     {
         super.setUp();
+        
+        this.phylomeStomatalComplex = OWL.Class(IRI.create("http://purl.obolibrary.org/obo/PO_0025215"));
+        this.bractStomatalComplex = OWL.Class(IRI.create("http://purl.obolibrary.org/obo/PO_0025216"));
+        this.plantAnatomicalEntity = OWL.Class(IRI.create("http://purl.obolibrary.org/obo/PO_0025131"));
+        this.phylome = OWL.Class(IRI.create("http://purl.obolibrary.org/obo/PO_0006001"));
         
         this.manager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
         
@@ -126,6 +135,53 @@ public class PlantOntologyReasonedPathTest extends AbstractSesameTest
     @After
     public void tearDown() throws Exception
     {
+        this.manager = null;
+        this.reasoner.dispose();
+        this.reasoner = null;
+    }
+    
+    @Test
+    public final void testClassHierarchyRenderingSubDirect() throws Exception
+    {
+        final Set<OWLClass> flattened = this.reasoner.getSubClasses(this.phylome, true).getFlattened();
+        
+        for(final OWLClass nextClass : flattened)
+        {
+            System.out.println(nextClass);
+        }
+    }
+    
+    @Test
+    public final void testClassHierarchyRenderingSubNotDirect() throws Exception
+    {
+        final Set<OWLClass> flattened = this.reasoner.getSubClasses(this.phylome, false).getFlattened();
+        
+        for(final OWLClass nextClass : flattened)
+        {
+            System.out.println(nextClass);
+        }
+    }
+    
+    @Test
+    public final void testClassHierarchyRenderingSuperDirect() throws Exception
+    {
+        final Set<OWLClass> flattened = this.reasoner.getSuperClasses(this.phylome, true).getFlattened();
+        
+        for(final OWLClass nextClass : flattened)
+        {
+            System.out.println(nextClass);
+        }
+    }
+    
+    @Test
+    public final void testClassHierarchyRenderingSuperNotDirect() throws Exception
+    {
+        final Set<OWLClass> flattened = this.reasoner.getSuperClasses(this.phylome, false).getFlattened();
+        
+        for(final OWLClass nextClass : flattened)
+        {
+            System.out.println(nextClass);
+        }
     }
     
     @Test
@@ -239,19 +295,16 @@ public class PlantOntologyReasonedPathTest extends AbstractSesameTest
         // out.println( "Why is " + madCow + " concept unsatisfiable?" );
         // renderer.render( exp );
         
-        final OWLClass phylomeStomatalComplex = OWL.Class(IRI.create("http://purl.obolibrary.org/obo/PO_0025215"));
-        final OWLClass bractStomatalComplex = OWL.Class(IRI.create("http://purl.obolibrary.org/obo/PO_0025216"));
-        final OWLClass plantAnatomicalEntity = OWL.Class(IRI.create("http://purl.obolibrary.org/obo/PO_0025131"));
-        final OWLClass phylome = OWL.Class(IRI.create("http://purl.obolibrary.org/obo/PO_0006001"));
-        
-        final Set<Set<OWLAxiom>> exp = expGen.getSubClassExplanations(bractStomatalComplex, phylomeStomatalComplex);
+        final Set<Set<OWLAxiom>> exp =
+                expGen.getSubClassExplanations(this.bractStomatalComplex, this.phylomeStomatalComplex);
         Assert.assertFalse(exp.isEmpty());
-        out.println("Why is " + bractStomatalComplex + " subclass of " + phylomeStomatalComplex + "?");
+        out.println("Why is " + this.bractStomatalComplex + " subclass of " + this.phylomeStomatalComplex + "?");
         renderer.render(exp);
         
-        final Set<Set<OWLAxiom>> exp2 = expGen.getSubClassExplanations(bractStomatalComplex, plantAnatomicalEntity);
+        final Set<Set<OWLAxiom>> exp2 =
+                expGen.getSubClassExplanations(this.bractStomatalComplex, this.plantAnatomicalEntity);
         Assert.assertFalse(exp2.isEmpty());
-        out.println("Why is " + bractStomatalComplex + " subclass of " + plantAnatomicalEntity + "?");
+        out.println("Why is " + this.bractStomatalComplex + " subclass of " + this.plantAnatomicalEntity + "?");
         renderer.render(exp2);
         
         renderer.endRendering();
