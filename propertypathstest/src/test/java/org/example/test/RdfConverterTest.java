@@ -15,6 +15,11 @@ import org.openrdf.OpenRDFException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * 
+ * @author Peter Ansell p_ansell@yahoo.com
+ * 
+ */
 public class RdfConverterTest
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(RdfConverterTest.class);
