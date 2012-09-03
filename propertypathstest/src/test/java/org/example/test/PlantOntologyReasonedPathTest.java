@@ -112,7 +112,7 @@ public class PlantOntologyReasonedPathTest extends AbstractSesameTest
         iog.fillOntology(this.manager, inferredAxiomsOntology);
         
         final RDFInserter inferredRepositoryHandler = new RDFInserter(this.getTestRepositoryConnection());
-        repositoryHandler.enforceContext(this.testContextUri);
+        inferredRepositoryHandler.enforceContext(this.testInferredContextUri);
         
         final RioRenderer inferencesRenderer =
                 new RioRenderer(inferredAxiomsOntology, this.manager, inferredRepositoryHandler, null,
@@ -139,6 +139,7 @@ public class PlantOntologyReasonedPathTest extends AbstractSesameTest
     @After
     public void tearDown() throws Exception
     {
+        super.tearDown();
         this.manager = null;
         if(this.reasoner != null)
         {
