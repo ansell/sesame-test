@@ -520,6 +520,55 @@ public class PlantOntologyReasonedPathTest extends AbstractSesameTest
         }
     }
     
+    @Test
+    public final void testCountWithInferredSpecificDistinctOWLThingNoExternalBinding() throws Exception
+    {
+        final TupleQuery query =
+                this.getTestRepositoryConnection()
+                        .prepareTupleQuery(
+                                QueryLanguage.SPARQL,
+                                "SELECT (COUNT(DISTINCT ?child) AS ?childCount) WHERE { ?child a <http://www.w3.org/2002/07/owl#Class> . ?child <http://www.w3.org/2000/01/rdf-schema#subClassOf>+ <http://www.w3.org/2002/07/owl#Thing> . FILTER(isIRI(?child) ) }");
+        
+        final DatasetImpl testDataset = new DatasetImpl();
+        testDataset.addDefaultGraph(this.testContextUri);
+        testDataset.addDefaultGraph(this.testInferredContextUri);
+        
+        query.setDataset(testDataset);
+        
+        // query.clearBindings();
+        // query.setBinding("parent",
+        // this.getTestValueFactory().createURI("http://www.w3.org/2002/07/owl#Thing"));
+        
+        final TupleQueryResult queryResult = query.evaluate();
+        
+        try
+        {
+            Assert.assertTrue(queryResult.hasNext());
+            
+            while(queryResult.hasNext())
+            {
+                final BindingSet bindingSet = queryResult.next();
+                
+                this.log.info("nextBinding: {}", bindingSet);
+                
+                // Assert.assertTrue(bindingSet.hasBinding("parent"));
+                
+                Assert.assertTrue(bindingSet.hasBinding("childCount"));
+                
+                final Literal value = (Literal)bindingSet.getBinding("childCount").getValue();
+                
+                Assert.assertEquals(1448, value.intValue());
+                
+                // FIXME: This is failing for this query for some reason
+                Assert.assertFalse("Should only have been one result binding", queryResult.hasNext());
+            }
+        }
+        finally
+        {
+            queryResult.close();
+        }
+    }
+    
     /**
      * Code originally from
      * pellet/example/src/test/java/org/mindswap/pellet/examples/ExplanationExample.java
