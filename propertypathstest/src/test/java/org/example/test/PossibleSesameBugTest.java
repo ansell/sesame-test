@@ -139,7 +139,6 @@ public class PossibleSesameBugTest extends AbstractSesameTest
         
         query.setDataset(testDataset);
         
-        query.clearBindings();
         query.setBinding("parent", this.getTestValueFactory().createURI("http://www.w3.org/2002/07/owl#Thing"));
         
         final TupleQueryResult queryResult = query.evaluate();
