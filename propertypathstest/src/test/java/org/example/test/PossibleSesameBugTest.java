@@ -76,19 +76,144 @@ public class PossibleSesameBugTest extends AbstractSesameTest
         }
     }
     
+    /**
+     * This method attempts to generate a minimal set of triples for this test case.
+     * 
+     * Unignore this method and change the file output location to regenerate more similar test files.
+     * 
+     * @throws Exception
+     */
     @Ignore
     @Test
     public final void testGenerateMinimalConcreteTripleTestFile() throws Exception
     {
-        this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/reducedinferredplantontology-v16.nt"), "", RDFFormat.NTRIPLES, this.testContextUri);
+        this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/inferredplantontology-v16.nt"), "", RDFFormat.NTRIPLES, this.testContextUri);
         this.getTestRepositoryConnection().commit();
         
         // Dump to a concrete set of triples to narrow down the cause
         RDFWriter writer = Rio.createWriter(RDFFormat.NTRIPLES, new FileOutputStream("/home/peter/temp/minimalinferredplantontology-v16.nt"));
         
-        GraphQuery query = this.getTestRepositoryConnection().prepareGraphQuery(QueryLanguage.SPARQL,  "CONSTRUCT { ?parent a ?parentType . ?class a ?type . ?class <http://www.w3.org/2000/01/rdf-schema#subClassOf> ?parent . ?grandchild a ?type . ?grandchild <http://www.w3.org/2000/01/rdf-schema#subClassOf> ?child . } WHERE { ?parent a ?parentType . ?class a ?type . ?class <http://www.w3.org/2000/01/rdf-schema#subClassOf> ?parent . } LIMIT 5");
+        //GraphQuery query = this.getTestRepositoryConnection().prepareGraphQuery(QueryLanguage.SPARQL,  "CONSTRUCT { ?parent a ?parentType . ?class a ?childType . ?class <http://www.w3.org/2000/01/rdf-schema#subClassOf> ?parent . } WHERE { ?class <http://www.w3.org/2000/01/rdf-schema#subClassOf> ?parent . OPTIONAL { ?parent a ?parentType . } OPTIONAL { ?class a ?childType . } } ORDER BY ?parent");
+        GraphQuery query = this.getTestRepositoryConnection().prepareGraphQuery(QueryLanguage.SPARQL,  "CONSTRUCT { ?parent a ?parentType . ?child a ?childType . ?child <http://www.w3.org/2000/01/rdf-schema#subClassOf> ?parent . } WHERE { ?child <http://www.w3.org/2000/01/rdf-schema#subClassOf> ?parent . OPTIONAL { ?parent a ?parentType . } OPTIONAL { ?child a ?childType . } FILTER(isIRI(?child) && isIRI(?parent))} ORDER BY DESC(?parent) OFFSET 0 LIMIT 1000");
         
         query.evaluate(writer);
+    }
+    
+    /**
+     * This test still failing
+     * @throws Exception
+     */
+    @Test
+    public final void testFromMinimalConcreteTripleTestFile() throws Exception
+    {
+        this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/minimalinferredplantontology-v16.nt"), "", RDFFormat.NTRIPLES, this.testContextUri);
+        this.getTestRepositoryConnection().commit();
+        
+        final TupleQuery query =
+                this.getTestRepositoryConnection()
+                        .prepareTupleQuery(
+                                QueryLanguage.SPARQL,
+                                "SELECT DISTINCT ?parent (COUNT(DISTINCT ?child) AS ?childCount) WHERE { ?child a <http://www.w3.org/2002/07/owl#Class> . ?child <http://www.w3.org/2000/01/rdf-schema#subClassOf>+ ?parent . FILTER(isIRI(?child) && isIRI(?parent)) } GROUP BY ?parent");
+        
+        final DatasetImpl testDataset = new DatasetImpl();
+        testDataset.addDefaultGraph(this.testContextUri);
+        // switch to a single context to see if that makes a difference
+        //testDataset.addDefaultGraph(this.testInferredContextUri);
+        
+        query.setDataset(testDataset);
+        
+        query.setBinding("parent", this.getTestValueFactory().createURI("http://www.w3.org/2002/07/owl#Thing"));
+        
+        final TupleQueryResult queryResult = query.evaluate();
+        
+        try
+        {
+            Assert.assertTrue(queryResult.hasNext());
+            
+            while(queryResult.hasNext())
+            {
+                final BindingSet bindingSet = queryResult.next();
+                
+                this.log.info("nextBinding: {}", bindingSet);
+                
+                // FIXME: This fails for one of the two bindings that comes out
+                Assert.assertTrue(bindingSet.hasBinding("parent"));
+                
+                Assert.assertTrue(bindingSet.hasBinding("childCount"));
+                
+                final Literal value = (Literal)bindingSet.getBinding("childCount").getValue();
+                
+                // TODO: 132 is the value returned when property paths are not used, the other
+                // result here, which does not have a parent binding shows a count of 1316
+                Assert.assertEquals(132, value.intValue());
+                
+                // FIXME: This is failing for this query for some reason
+                // assertFalse("Should only have been one result binding", queryResult.hasNext());
+            }
+        }
+        finally
+        {
+            queryResult.close();
+        }
+    }
+    
+    /**
+     * This test still failing
+     * @throws Exception
+     */
+    @Ignore
+    @Test
+    public final void testFromGrepReducedConcreteTripleTestFile() throws Exception
+    {
+        this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/grep-reducedinferredplantontology-v16.nt"), "", RDFFormat.NTRIPLES, this.testContextUri);
+        this.getTestRepositoryConnection().commit();
+        
+        final TupleQuery query =
+                this.getTestRepositoryConnection()
+                        .prepareTupleQuery(
+                                QueryLanguage.SPARQL,
+                                "SELECT DISTINCT ?parent (COUNT(DISTINCT ?child) AS ?childCount) WHERE { ?child a <http://www.w3.org/2002/07/owl#Class> . ?child <http://www.w3.org/2000/01/rdf-schema#subClassOf>+ ?parent . FILTER(isIRI(?child) && isIRI(?parent)) } GROUP BY ?parent");
+        
+        final DatasetImpl testDataset = new DatasetImpl();
+        testDataset.addDefaultGraph(this.testContextUri);
+        // switch to a single context to see if that makes a difference
+        //testDataset.addDefaultGraph(this.testInferredContextUri);
+        
+        query.setDataset(testDataset);
+        
+        query.setBinding("parent", this.getTestValueFactory().createURI("http://www.w3.org/2002/07/owl#Thing"));
+        
+        final TupleQueryResult queryResult = query.evaluate();
+        
+        try
+        {
+            Assert.assertTrue(queryResult.hasNext());
+            
+            while(queryResult.hasNext())
+            {
+                final BindingSet bindingSet = queryResult.next();
+                
+                this.log.info("nextBinding: {}", bindingSet);
+                
+                // FIXME: This fails for the only binding that comes out of this hand crafted file
+                Assert.assertTrue(bindingSet.hasBinding("parent"));
+                
+                Assert.assertTrue(bindingSet.hasBinding("childCount"));
+                
+                final Literal value = (Literal)bindingSet.getBinding("childCount").getValue();
+                
+                // TODO: 132 is the value returned when property paths are not used, the other
+                // result here, which does not have a parent binding shows a count of 1316
+                Assert.assertEquals(132, value.intValue());
+                
+                // FIXME: This is failing for this query for some reason
+                // assertFalse("Should only have been one result binding", queryResult.hasNext());
+            }
+        }
+        finally
+        {
+            queryResult.close();
+        }
     }
     
     /**
@@ -96,6 +221,7 @@ public class PossibleSesameBugTest extends AbstractSesameTest
      * 
      * @throws Exception
      */
+    @Ignore
     @Test
     public final void testGenerateReducedConcreteTriplesTestFile() throws Exception
     {
@@ -105,7 +231,7 @@ public class PossibleSesameBugTest extends AbstractSesameTest
         // Dump to a concrete set of triples to narrow down the cause
         RDFWriter writer = Rio.createWriter(RDFFormat.NTRIPLES, new FileOutputStream("/home/peter/temp/reducedinferredplantontology-v16.nt"));
         
-        GraphQuery query = this.getTestRepositoryConnection().prepareGraphQuery(QueryLanguage.SPARQL,  "CONSTRUCT { ?parent a ?parentType . ?class a ?childType . ?class <http://www.w3.org/2000/01/rdf-schema#subClassOf> ?parent . } WHERE { ?class <http://www.w3.org/2000/01/rdf-schema#subClassOf> ?parent . OPTIONAL { ?parent a ?parentType . } OPTIONAL { ?class a ?childType . } FILTER(isIRI(?class)) . }");
+        GraphQuery query = this.getTestRepositoryConnection().prepareGraphQuery(QueryLanguage.SPARQL,  "CONSTRUCT { ?parent a ?parentType . ?class a ?childType . ?class <http://www.w3.org/2000/01/rdf-schema#subClassOf> ?parent . } WHERE { ?class <http://www.w3.org/2000/01/rdf-schema#subClassOf> ?parent . OPTIONAL { ?parent a ?parentType . } OPTIONAL { ?class a ?childType . } }");
         
         query.evaluate(writer);
     }
@@ -114,6 +240,7 @@ public class PossibleSesameBugTest extends AbstractSesameTest
      * This test still failing
      * @throws Exception
      */
+    @Ignore
     @Test
     public final void testFromReducedConcreteTripleTestFile() throws Exception
     {
