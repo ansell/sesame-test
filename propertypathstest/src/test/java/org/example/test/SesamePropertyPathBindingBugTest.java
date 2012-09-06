@@ -38,10 +38,14 @@ import org.semanticweb.owlapi.rio.RioRenderer;
 import org.semanticweb.owlapi.util.InferredOntologyGenerator;
 
 /**
+ * This is a test case for the issue:
+ * 
+ * http://www.openrdf.org/issues/browse/SES-1091
+ * 
  * @author Peter Ansell p_ansell@yahoo.com
  * 
  */
-public class PossibleSesameBugTest extends AbstractSesameTest
+public class SesamePropertyPathBindingBugTest extends AbstractSesameTest
 {
     private OWLOntologyManager manager;
     private OWLOntology parsedOntology;
