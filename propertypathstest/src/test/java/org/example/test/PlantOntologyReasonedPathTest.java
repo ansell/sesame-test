@@ -507,11 +507,9 @@ public class PlantOntologyReasonedPathTest extends AbstractSesameTest
                 
                 final Literal value = (Literal)bindingSet.getBinding("childCount").getValue();
                 
-                Assert.assertEquals(132, value.intValue());
+                Assert.assertEquals(1448, value.intValue());
                 
-                // FIXME: This is failing for this query for some reason
-                // Assert.assertFalse("Should only have been one result binding",
-                // queryResult.hasNext());
+                Assert.assertFalse("Should only have been one result binding", queryResult.hasNext());
             }
         }
         finally
