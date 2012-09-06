@@ -78,619 +78,6 @@ public class PossibleSesameBugTest extends AbstractSesameTest
     }
     
     /**
-     * This method attempts to generate a minimal set of triples for this test case.
-     * 
-     * Unignore this method and change the file output location to regenerate more similar test
-     * files.
-     * 
-     * @throws Exception
-     */
-    @Ignore
-    @Test
-    public final void testGenerateMinimalConcreteTripleTestFile() throws Exception
-    {
-        this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/inferredplantontology-v16.nt"),
-                "", RDFFormat.NTRIPLES, this.testContextUri);
-        this.getTestRepositoryConnection().commit();
-        
-        // Dump to a concrete set of triples to narrow down the cause
-        RDFWriter writer =
-                Rio.createWriter(RDFFormat.NTRIPLES, new FileOutputStream(
-                        "/home/peter/temp/minimalinferredplantontology-v16.nt"));
-        
-        // GraphQuery query =
-        // this.getTestRepositoryConnection().prepareGraphQuery(QueryLanguage.SPARQL,
-        // "CONSTRUCT { ?parent a ?parentType . ?class a ?childType . ?class <http://www.w3.org/2000/01/rdf-schema#subClassOf> ?parent . } WHERE { ?class <http://www.w3.org/2000/01/rdf-schema#subClassOf> ?parent . OPTIONAL { ?parent a ?parentType . } OPTIONAL { ?class a ?childType . } } ORDER BY ?parent");
-        GraphQuery query =
-                this.getTestRepositoryConnection()
-                        .prepareGraphQuery(
-                                QueryLanguage.SPARQL,
-                                "CONSTRUCT { ?parent a ?parentType . ?child a ?childType . ?child <http://www.w3.org/2000/01/rdf-schema#subClassOf> ?parent . } WHERE { ?child <http://www.w3.org/2000/01/rdf-schema#subClassOf> ?parent . OPTIONAL { ?parent a ?parentType . } OPTIONAL { ?child a ?childType . } FILTER(isIRI(?child) && isIRI(?parent))} ORDER BY DESC(?parent) OFFSET 0 LIMIT 1000");
-        
-        query.evaluate(writer);
-    }
-    
-    /**
-     * This test still failing
-     * 
-     * @throws Exception
-     */
-    @Test
-    public final void testFromMinimalConcreteTripleTestFileWithoutCountAndGroupBy() throws Exception
-    {
-        this.getTestRepositoryConnection().add(
-                this.getClass().getResourceAsStream("/minimalinferredplantontology-v16.nt"), "", RDFFormat.NTRIPLES,
-                this.testContextUri);
-        this.getTestRepositoryConnection().commit();
-        
-        final TupleQuery query =
-                this.getTestRepositoryConnection()
-                        .prepareTupleQuery(
-                                QueryLanguage.SPARQL,
-                                "SELECT DISTINCT ?parent ?child WHERE { ?child a owl:Class . ?child rdfs:subClassOf+ ?parent . FILTER(isIRI(?child) && isIRI(?parent)) } LIMIT 10000 OFFSET 0");
-        
-        final DatasetImpl testDataset = new DatasetImpl();
-        testDataset.addDefaultGraph(this.testContextUri);
-        // switch to a single context to see if that makes a difference
-        // testDataset.addDefaultGraph(this.testInferredContextUri);
-        
-        query.setDataset(testDataset);
-        
-        query.setBinding("parent", this.getTestValueFactory().createURI("http://www.w3.org/2002/07/owl#Thing"));
-        
-        final TupleQueryResult queryResult = query.evaluate();
-        
-        try
-        {
-            Assert.assertTrue(queryResult.hasNext());
-            
-            AtomicInteger count = new AtomicInteger(0);
-            AtomicInteger missingParentCount = new AtomicInteger(0);
-            
-            while(queryResult.hasNext())
-            {
-                final BindingSet bindingSet = queryResult.next();
-                
-                this.log.info("nextBinding: {}", bindingSet);
-                
-                // FIXME: This fails for one of the two bindings that comes out
-                // Assert.assertTrue(bindingSet.hasBinding("parent"));
-                if(!bindingSet.hasBinding("parent"))
-                {
-                    missingParentCount.incrementAndGet();
-                }
-                
-                Assert.assertTrue(bindingSet.hasBinding("child"));
-                
-                // final Literal value = (Literal)bindingSet.getBinding("childCount").getValue();
-                
-                // TODO: 132 is the value returned when property paths are not used, the other
-                // result here, which does not have a parent binding shows a count of 1316
-                // Assert.assertEquals(132, value.intValue());
-                
-                // FIXME: This is failing for this query for some reason
-                // assertFalse("Should only have been one result binding", queryResult.hasNext());
-                
-                count.incrementAndGet();
-            }
-            
-            Assert.assertEquals(157, count.get());
-            
-            Assert.assertEquals("Parent should have been bound to each binding", 0, missingParentCount.get());
-        }
-        finally
-        {
-            queryResult.close();
-        }
-    }
-    
-    /**
-     * This test still failing
-     * 
-     * @throws Exception
-     */
-    @Test
-    public final void testFromSimpleConcreteTripleTestFileWithOnlyPropertyPathAndQuerySetBinding() throws Exception
-    {
-        this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/simpletestfile.nt"), "",
-                RDFFormat.NTRIPLES, this.testContextUri);
-        this.getTestRepositoryConnection().commit();
-        
-        final TupleQuery query = this.getTestRepositoryConnection().prepareTupleQuery(QueryLanguage.SPARQL,
-        // "SELECT ?parent ?child WHERE { ?child a <http://www.w3.org/2002/07/owl#Class> . ?child rdfs:subClassOf+ ?parent . } ");
-                "SELECT ?parent ?child WHERE { ?child rdfs:subClassOf+ ?parent . } ");
-        
-        // The bug appears even if the dataset is not replaced
-        final DatasetImpl testDataset = new DatasetImpl();
-        testDataset.addDefaultGraph(this.testContextUri);
-        // switch to a single context to see if that makes a difference
-        // testDataset.addDefaultGraph(this.testInferredContextUri);
-        query.setDataset(testDataset);
-        
-        query.setBinding("parent", this.getTestValueFactory().createURI("http://www.w3.org/2002/07/owl#Thing"));
-        
-        final TupleQueryResult queryResult = query.evaluate();
-        
-        try
-        {
-            Assert.assertTrue(queryResult.hasNext());
-            
-            AtomicInteger count = new AtomicInteger(0);
-            AtomicInteger missingParentCount = new AtomicInteger(0);
-            
-            while(queryResult.hasNext())
-            {
-                final BindingSet bindingSet = queryResult.next();
-                
-                this.log.info("nextBinding: {}", bindingSet);
-                
-                // FIXME: This fails for one of the two bindings that comes out
-                // Assert.assertTrue(bindingSet.hasBinding("parent"));
-                
-                if(!bindingSet.hasBinding("parent"))
-                {
-                    missingParentCount.incrementAndGet();
-                }
-                
-                Assert.assertTrue(bindingSet.hasBinding("child"));
-                
-                // final Literal value = (Literal)bindingSet.getBinding("childCount").getValue();
-                
-                // TODO: 132 is the value returned when property paths are not used, the other
-                // result here, which does not have a parent binding shows a count of 1316
-                // Assert.assertEquals(132, value.intValue());
-                
-                // FIXME: This is failing for this query for some reason
-                // assertFalse("Should only have been one result binding", queryResult.hasNext());
-                
-                count.incrementAndGet();
-            }
-            
-            Assert.assertEquals(4, count.get());
-            
-            Assert.assertEquals("Parent should have been bound to each binding", 0, missingParentCount.get());
-        }
-        finally
-        {
-            queryResult.close();
-        }
-    }
-    
-    /**
-     * This test still failing
-     * 
-     * @throws Exception
-     */
-    @Test
-    public final void testFromSimpleConcreteTripleTestFileWithoutCountAndGroupBy() throws Exception
-    {
-        this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/simpletestfile.nt"), "",
-                RDFFormat.NTRIPLES, this.testContextUri);
-        this.getTestRepositoryConnection().commit();
-        
-        final TupleQuery query =
-                this.getTestRepositoryConnection()
-                        .prepareTupleQuery(
-                                QueryLanguage.SPARQL,
-                                "SELECT DISTINCT ?parent ?child WHERE { ?child a <http://www.w3.org/2002/07/owl#Class> . ?child rdfs:subClassOf+ ?parent . FILTER(isIRI(?child) && isIRI(?parent)) } LIMIT 10000 OFFSET 0");
-        
-        // The bug appears even if the dataset is not replaced
-        final DatasetImpl testDataset = new DatasetImpl();
-        testDataset.addDefaultGraph(this.testContextUri);
-        // switch to a single context to see if that makes a difference
-        // testDataset.addDefaultGraph(this.testInferredContextUri);
-        query.setDataset(testDataset);
-        
-        query.setBinding("parent", this.getTestValueFactory().createURI("http://www.w3.org/2002/07/owl#Thing"));
-        
-        final TupleQueryResult queryResult = query.evaluate();
-        
-        try
-        {
-            Assert.assertTrue(queryResult.hasNext());
-            
-            AtomicInteger count = new AtomicInteger(0);
-            AtomicInteger missingParentCount = new AtomicInteger(0);
-            
-            while(queryResult.hasNext())
-            {
-                final BindingSet bindingSet = queryResult.next();
-                
-                this.log.info("nextBinding: {}", bindingSet);
-                
-                // FIXME: This fails for one of the two bindings that comes out
-                // Assert.assertTrue(bindingSet.hasBinding("parent"));
-                
-                if(!bindingSet.hasBinding("parent"))
-                {
-                    missingParentCount.incrementAndGet();
-                }
-                
-                Assert.assertTrue(bindingSet.hasBinding("child"));
-                
-                // final Literal value = (Literal)bindingSet.getBinding("childCount").getValue();
-                
-                // TODO: 132 is the value returned when property paths are not used, the other
-                // result here, which does not have a parent binding shows a count of 1316
-                // Assert.assertEquals(132, value.intValue());
-                
-                // FIXME: This is failing for this query for some reason
-                // assertFalse("Should only have been one result binding", queryResult.hasNext());
-                
-                count.incrementAndGet();
-            }
-            
-            Assert.assertEquals(4, count.get());
-            
-            Assert.assertEquals("Parent should have been bound to each binding", 0, missingParentCount.get());
-        }
-        finally
-        {
-            queryResult.close();
-        }
-    }
-    
-    /**
-     * This test still failing
-     * 
-     * @throws Exception
-     */
-    @Test
-    public final void testFromSimpleConcreteTripleTestFileWithCountAndGroupBy() throws Exception
-    {
-        this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/simpletestfile.nt"), "",
-                RDFFormat.NTRIPLES, this.testContextUri);
-        this.getTestRepositoryConnection().commit();
-        
-        final TupleQuery query =
-                this.getTestRepositoryConnection()
-                        .prepareTupleQuery(
-                                QueryLanguage.SPARQL,
-                                "SELECT DISTINCT ?parent (COUNT(DISTINCT ?child) AS ?childCount) WHERE { ?child a <http://www.w3.org/2002/07/owl#Class> . ?child <http://www.w3.org/2000/01/rdf-schema#subClassOf>+ ?parent . FILTER(isIRI(?child) && isIRI(?parent)) } GROUP BY ?parent");
-        
-        final DatasetImpl testDataset = new DatasetImpl();
-        testDataset.addDefaultGraph(this.testContextUri);
-        // switch to a single context to see if that makes a difference
-        // testDataset.addDefaultGraph(this.testInferredContextUri);
-        
-        query.setDataset(testDataset);
-        
-        query.setBinding("parent", this.getTestValueFactory().createURI("http://www.w3.org/2002/07/owl#Thing"));
-        
-        final TupleQueryResult queryResult = query.evaluate();
-        
-        try
-        {
-            Assert.assertTrue(queryResult.hasNext());
-            
-            AtomicInteger missingParentCount = new AtomicInteger(0);
-            
-            while(queryResult.hasNext())
-            {
-                final BindingSet bindingSet = queryResult.next();
-                
-                this.log.info("nextBinding: {}", bindingSet);
-                
-                // FIXME: This fails for one of the two bindings that comes out
-                // Assert.assertTrue(bindingSet.hasBinding("parent"));
-                
-                Assert.assertTrue(bindingSet.hasBinding("childCount"));
-                
-                final Literal value = (Literal)bindingSet.getBinding("childCount").getValue();
-                
-                // TODO: 132 is the value returned when property paths are not used, the other
-                // result here, which does not have a parent binding shows a count of 1316
-                Assert.assertEquals(4, value.intValue());
-                
-                // FIXME: This fails for one of the two bindings that comes out
-                // Do this check after the check on childCount to verify that the count is correct
-                // in this case
-                // Assert.assertTrue(bindingSet.hasBinding("parent"));
-                if(!bindingSet.hasBinding("parent"))
-                {
-                    missingParentCount.incrementAndGet();
-                }
-                
-                // FIXME: This is failing for this query for some reason
-                Assert.assertFalse("Should only have been one result binding", queryResult.hasNext());
-            }
-            
-            Assert.assertEquals("Parent should have been bound to each binding", 0, missingParentCount.get());
-        }
-        finally
-        {
-            queryResult.close();
-        }
-    }
-    
-    /**
-     * This test still failing
-     * 
-     * @throws Exception
-     */
-    @Test
-    public final void testFromMinimalConcreteTripleTestFile() throws Exception
-    {
-        this.getTestRepositoryConnection().add(
-                this.getClass().getResourceAsStream("/minimalinferredplantontology-v16.nt"), "", RDFFormat.NTRIPLES,
-                this.testContextUri);
-        this.getTestRepositoryConnection().commit();
-        
-        final TupleQuery query =
-                this.getTestRepositoryConnection()
-                        .prepareTupleQuery(
-                                QueryLanguage.SPARQL,
-                                "SELECT DISTINCT ?parent (COUNT(DISTINCT ?child) AS ?childCount) WHERE { ?child a <http://www.w3.org/2002/07/owl#Class> . ?child <http://www.w3.org/2000/01/rdf-schema#subClassOf>+ ?parent . FILTER(isIRI(?child) && isIRI(?parent)) } GROUP BY ?parent");
-        
-        final DatasetImpl testDataset = new DatasetImpl();
-        testDataset.addDefaultGraph(this.testContextUri);
-        // switch to a single context to see if that makes a difference
-        // testDataset.addDefaultGraph(this.testInferredContextUri);
-        
-        query.setDataset(testDataset);
-        
-        query.setBinding("parent", this.getTestValueFactory().createURI("http://www.w3.org/2002/07/owl#Thing"));
-        
-        final TupleQueryResult queryResult = query.evaluate();
-        
-        try
-        {
-            Assert.assertTrue(queryResult.hasNext());
-            
-            AtomicInteger count = new AtomicInteger(0);
-            AtomicInteger missingParentCount = new AtomicInteger(0);
-            
-            while(queryResult.hasNext())
-            {
-                final BindingSet bindingSet = queryResult.next();
-                
-                this.log.info("nextBinding: {}", bindingSet);
-                
-                // FIXME: This fails for one of the two bindings that comes out
-                // Assert.assertTrue(bindingSet.hasBinding("parent"));
-                if(!bindingSet.hasBinding("parent"))
-                {
-                    missingParentCount.incrementAndGet();
-                }
-                
-                Assert.assertTrue(bindingSet.hasBinding("childCount"));
-                
-                final Literal value = (Literal)bindingSet.getBinding("childCount").getValue();
-                
-                // TODO: 132 is the value returned when property paths are not used, the other
-                // result here, which does not have a parent binding shows a count of 1316
-                // The other binding returns 25 for the minimal set
-                // Assert.assertEquals(132, value.intValue());
-                
-                // FIXME: This is failing for this query for some reason
-                // assertFalse("Should only have been one result binding", queryResult.hasNext());
-                count.incrementAndGet();
-            }
-            
-            Assert.assertEquals("Parent should have been bound to each binding", 0, missingParentCount.get());
-            
-            Assert.assertEquals("There should have only been one result from the query", 0, count.get());
-        }
-        finally
-        {
-            queryResult.close();
-        }
-    }
-    
-    /**
-     * This test still failing
-     * 
-     * @throws Exception
-     */
-    @Ignore
-    @Test
-    public final void testFromGrepReducedConcreteTripleTestFile() throws Exception
-    {
-        this.getTestRepositoryConnection().add(
-                this.getClass().getResourceAsStream("/grep-reducedinferredplantontology-v16.nt"), "",
-                RDFFormat.NTRIPLES, this.testContextUri);
-        this.getTestRepositoryConnection().commit();
-        
-        final TupleQuery query =
-                this.getTestRepositoryConnection()
-                        .prepareTupleQuery(
-                                QueryLanguage.SPARQL,
-                                "SELECT DISTINCT ?parent (COUNT(DISTINCT ?child) AS ?childCount) WHERE { ?child a <http://www.w3.org/2002/07/owl#Class> . ?child <http://www.w3.org/2000/01/rdf-schema#subClassOf>+ ?parent . FILTER(isIRI(?child) && isIRI(?parent)) } GROUP BY ?parent");
-        
-        final DatasetImpl testDataset = new DatasetImpl();
-        testDataset.addDefaultGraph(this.testContextUri);
-        // switch to a single context to see if that makes a difference
-        // testDataset.addDefaultGraph(this.testInferredContextUri);
-        
-        query.setDataset(testDataset);
-        
-        query.setBinding("parent", this.getTestValueFactory().createURI("http://www.w3.org/2002/07/owl#Thing"));
-        
-        final TupleQueryResult queryResult = query.evaluate();
-        
-        try
-        {
-            Assert.assertTrue(queryResult.hasNext());
-            
-            while(queryResult.hasNext())
-            {
-                final BindingSet bindingSet = queryResult.next();
-                
-                this.log.info("nextBinding: {}", bindingSet);
-                
-                // FIXME: This fails for the only binding that comes out of this hand crafted file
-                Assert.assertTrue(bindingSet.hasBinding("parent"));
-                
-                Assert.assertTrue(bindingSet.hasBinding("childCount"));
-                
-                final Literal value = (Literal)bindingSet.getBinding("childCount").getValue();
-                
-                // TODO: 132 is the value returned when property paths are not used, the other
-                // result here, which does not have a parent binding shows a count of 1316
-                Assert.assertEquals(132, value.intValue());
-                
-                // FIXME: This is failing for this query for some reason
-                // assertFalse("Should only have been one result binding", queryResult.hasNext());
-            }
-        }
-        finally
-        {
-            queryResult.close();
-        }
-    }
-    
-    /**
-     * Use this method to load up all of the concrete triples and then export the interesting
-     * statements to a reduced file.
-     * 
-     * @throws Exception
-     */
-    @Ignore
-    @Test
-    public final void testGenerateReducedConcreteTriplesTestFile() throws Exception
-    {
-        this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/inferredplantontology-v16.nt"),
-                "", RDFFormat.NTRIPLES, this.testContextUri);
-        this.getTestRepositoryConnection().commit();
-        
-        // Dump to a concrete set of triples to narrow down the cause
-        RDFWriter writer =
-                Rio.createWriter(RDFFormat.NTRIPLES, new FileOutputStream(
-                        "/home/peter/temp/reducedinferredplantontology-v16.nt"));
-        
-        GraphQuery query =
-                this.getTestRepositoryConnection()
-                        .prepareGraphQuery(
-                                QueryLanguage.SPARQL,
-                                "CONSTRUCT { ?parent a ?parentType . ?class a ?childType . ?class <http://www.w3.org/2000/01/rdf-schema#subClassOf> ?parent . } WHERE { ?class <http://www.w3.org/2000/01/rdf-schema#subClassOf> ?parent . OPTIONAL { ?parent a ?parentType . } OPTIONAL { ?class a ?childType . } }");
-        
-        query.evaluate(writer);
-    }
-    
-    /**
-     * This test still failing
-     * 
-     * @throws Exception
-     */
-    @Ignore
-    @Test
-    public final void testFromReducedConcreteTripleTestFile() throws Exception
-    {
-        this.getTestRepositoryConnection().add(
-                this.getClass().getResourceAsStream("/reducedinferredplantontology-v16.nt"), "", RDFFormat.NTRIPLES,
-                this.testContextUri);
-        this.getTestRepositoryConnection().commit();
-        
-        final TupleQuery query =
-                this.getTestRepositoryConnection()
-                        .prepareTupleQuery(
-                                QueryLanguage.SPARQL,
-                                "SELECT DISTINCT ?parent (COUNT(DISTINCT ?child) AS ?childCount) WHERE { ?child a <http://www.w3.org/2002/07/owl#Class> . ?child <http://www.w3.org/2000/01/rdf-schema#subClassOf>+ ?parent . FILTER(isIRI(?child) && isIRI(?parent)) } GROUP BY ?parent");
-        
-        final DatasetImpl testDataset = new DatasetImpl();
-        testDataset.addDefaultGraph(this.testContextUri);
-        // switch to a single context to see if that makes a difference
-        // testDataset.addDefaultGraph(this.testInferredContextUri);
-        
-        query.setDataset(testDataset);
-        
-        query.setBinding("parent", this.getTestValueFactory().createURI("http://www.w3.org/2002/07/owl#Thing"));
-        
-        final TupleQueryResult queryResult = query.evaluate();
-        
-        try
-        {
-            Assert.assertTrue(queryResult.hasNext());
-            
-            while(queryResult.hasNext())
-            {
-                final BindingSet bindingSet = queryResult.next();
-                
-                this.log.info("nextBinding: {}", bindingSet);
-                
-                // FIXME: This fails for one of the two bindings that comes out
-                Assert.assertTrue(bindingSet.hasBinding("parent"));
-                
-                Assert.assertTrue(bindingSet.hasBinding("childCount"));
-                
-                final Literal value = (Literal)bindingSet.getBinding("childCount").getValue();
-                
-                // TODO: 132 is the value returned when property paths are not used, the other
-                // result here, which does not have a parent binding shows a count of 1316
-                Assert.assertEquals(132, value.intValue());
-                
-                // FIXME: This is failing for this query for some reason
-                // assertFalse("Should only have been one result binding", queryResult.hasNext());
-            }
-        }
-        finally
-        {
-            queryResult.close();
-        }
-    }
-    
-    /**
-     * This test fails still.
-     * 
-     * @throws Exception
-     */
-    @Ignore
-    @Test
-    public final void testFromFullConcreteTripleTestFile() throws Exception
-    {
-        this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/inferredplantontology-v16.nt"),
-                "", RDFFormat.NTRIPLES, this.testContextUri);
-        this.getTestRepositoryConnection().commit();
-        
-        final TupleQuery query =
-                this.getTestRepositoryConnection()
-                        .prepareTupleQuery(
-                                QueryLanguage.SPARQL,
-                                "SELECT DISTINCT ?parent (COUNT(DISTINCT ?child) AS ?childCount) WHERE { ?child a <http://www.w3.org/2002/07/owl#Class> . ?child <http://www.w3.org/2000/01/rdf-schema#subClassOf>+ ?parent . FILTER(isIRI(?child) && isIRI(?parent)) } GROUP BY ?parent");
-        
-        final DatasetImpl testDataset = new DatasetImpl();
-        testDataset.addDefaultGraph(this.testContextUri);
-        // switch to a single context to see if that makes a difference
-        // testDataset.addDefaultGraph(this.testInferredContextUri);
-        
-        query.setDataset(testDataset);
-        
-        query.setBinding("parent", this.getTestValueFactory().createURI("http://www.w3.org/2002/07/owl#Thing"));
-        
-        final TupleQueryResult queryResult = query.evaluate();
-        
-        try
-        {
-            Assert.assertTrue(queryResult.hasNext());
-            
-            while(queryResult.hasNext())
-            {
-                final BindingSet bindingSet = queryResult.next();
-                
-                this.log.info("nextBinding: {}", bindingSet);
-                
-                // FIXME: This fails for one of the two bindings that comes out
-                Assert.assertTrue(bindingSet.hasBinding("parent"));
-                
-                Assert.assertTrue(bindingSet.hasBinding("childCount"));
-                
-                final Literal value = (Literal)bindingSet.getBinding("childCount").getValue();
-                
-                // TODO: 132 is the value returned when property paths are not used, the other
-                // result here, which does not have a parent binding shows a count of 1316
-                Assert.assertEquals(132, value.intValue());
-                
-                // FIXME: This is failing for this query for some reason
-                // assertFalse("Should only have been one result binding", queryResult.hasNext());
-            }
-        }
-        finally
-        {
-            queryResult.close();
-        }
-    }
-    
-    /**
      * Complete version of the test, now focusing on reducing the case down to a small set of
      * statements.
      * 
@@ -698,7 +85,7 @@ public class PossibleSesameBugTest extends AbstractSesameTest
      */
     @Ignore
     @Test
-    public final void testCountWithInferredSpecificDistinctOWLThingAlternative() throws Exception
+    public final void testFromCountWithInferredSpecificDistinctOWLThingAlternative() throws Exception
     {
         this.manager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
         
@@ -805,5 +192,764 @@ public class PossibleSesameBugTest extends AbstractSesameTest
         {
             queryResult.close();
         }
+    }
+    
+    /**
+     * This test fails still.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public final void testFromFullConcreteTripleTestFile() throws Exception
+    {
+        this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/inferredplantontology-v16.nt"),
+                "", RDFFormat.NTRIPLES, this.testContextUri);
+        this.getTestRepositoryConnection().commit();
+        
+        final TupleQuery query =
+                this.getTestRepositoryConnection()
+                        .prepareTupleQuery(
+                                QueryLanguage.SPARQL,
+                                "SELECT DISTINCT ?parent (COUNT(DISTINCT ?child) AS ?childCount) WHERE { ?child a <http://www.w3.org/2002/07/owl#Class> . ?child <http://www.w3.org/2000/01/rdf-schema#subClassOf>+ ?parent . FILTER(isIRI(?child) && isIRI(?parent)) } GROUP BY ?parent");
+        
+        final DatasetImpl testDataset = new DatasetImpl();
+        testDataset.addDefaultGraph(this.testContextUri);
+        // switch to a single context to see if that makes a difference
+        // testDataset.addDefaultGraph(this.testInferredContextUri);
+        
+        query.setDataset(testDataset);
+        
+        query.setBinding("parent", this.getTestValueFactory().createURI("http://www.w3.org/2002/07/owl#Thing"));
+        
+        final TupleQueryResult queryResult = query.evaluate();
+        
+        try
+        {
+            Assert.assertTrue(queryResult.hasNext());
+            
+            while(queryResult.hasNext())
+            {
+                final BindingSet bindingSet = queryResult.next();
+                
+                this.log.info("nextBinding: {}", bindingSet);
+                
+                // FIXME: This fails for one of the two bindings that comes out
+                Assert.assertTrue(bindingSet.hasBinding("parent"));
+                
+                Assert.assertTrue(bindingSet.hasBinding("childCount"));
+                
+                final Literal value = (Literal)bindingSet.getBinding("childCount").getValue();
+                
+                // TODO: 132 is the value returned when property paths are not used, the other
+                // result here, which does not have a parent binding shows a count of 1316
+                Assert.assertEquals(132, value.intValue());
+                
+                // FIXME: This is failing for this query for some reason
+                // assertFalse("Should only have been one result binding", queryResult.hasNext());
+            }
+        }
+        finally
+        {
+            queryResult.close();
+        }
+    }
+    
+    /**
+     * This test still failing
+     * 
+     * @throws Exception
+     */
+    @Ignore
+    @Test
+    public final void testFromGrepReducedConcreteTripleTestFile() throws Exception
+    {
+        this.getTestRepositoryConnection().add(
+                this.getClass().getResourceAsStream("/grep-reducedinferredplantontology-v16.nt"), "",
+                RDFFormat.NTRIPLES, this.testContextUri);
+        this.getTestRepositoryConnection().commit();
+        
+        final TupleQuery query =
+                this.getTestRepositoryConnection()
+                        .prepareTupleQuery(
+                                QueryLanguage.SPARQL,
+                                "SELECT DISTINCT ?parent (COUNT(DISTINCT ?child) AS ?childCount) WHERE { ?child a <http://www.w3.org/2002/07/owl#Class> . ?child <http://www.w3.org/2000/01/rdf-schema#subClassOf>+ ?parent . FILTER(isIRI(?child) && isIRI(?parent)) } GROUP BY ?parent");
+        
+        final DatasetImpl testDataset = new DatasetImpl();
+        testDataset.addDefaultGraph(this.testContextUri);
+        // switch to a single context to see if that makes a difference
+        // testDataset.addDefaultGraph(this.testInferredContextUri);
+        
+        query.setDataset(testDataset);
+        
+        query.setBinding("parent", this.getTestValueFactory().createURI("http://www.w3.org/2002/07/owl#Thing"));
+        
+        final TupleQueryResult queryResult = query.evaluate();
+        
+        try
+        {
+            Assert.assertTrue(queryResult.hasNext());
+            
+            while(queryResult.hasNext())
+            {
+                final BindingSet bindingSet = queryResult.next();
+                
+                this.log.info("nextBinding: {}", bindingSet);
+                
+                // FIXME: This fails for the only binding that comes out of this hand crafted file
+                Assert.assertTrue(bindingSet.hasBinding("parent"));
+                
+                Assert.assertTrue(bindingSet.hasBinding("childCount"));
+                
+                final Literal value = (Literal)bindingSet.getBinding("childCount").getValue();
+                
+                // TODO: 132 is the value returned when property paths are not used, the other
+                // result here, which does not have a parent binding shows a count of 1316
+                Assert.assertEquals(132, value.intValue());
+                
+                // FIXME: This is failing for this query for some reason
+                // assertFalse("Should only have been one result binding", queryResult.hasNext());
+            }
+        }
+        finally
+        {
+            queryResult.close();
+        }
+    }
+    
+    /**
+     * This test still failing
+     * 
+     * @throws Exception
+     */
+    @Test
+    public final void testFromMinimalConcreteTripleTestFile() throws Exception
+    {
+        this.getTestRepositoryConnection().add(
+                this.getClass().getResourceAsStream("/minimalinferredplantontology-v16.nt"), "", RDFFormat.NTRIPLES,
+                this.testContextUri);
+        this.getTestRepositoryConnection().commit();
+        
+        final TupleQuery query =
+                this.getTestRepositoryConnection()
+                        .prepareTupleQuery(
+                                QueryLanguage.SPARQL,
+                                "SELECT DISTINCT ?parent (COUNT(DISTINCT ?child) AS ?childCount) WHERE { ?child a <http://www.w3.org/2002/07/owl#Class> . ?child <http://www.w3.org/2000/01/rdf-schema#subClassOf>+ ?parent . FILTER(isIRI(?child) && isIRI(?parent)) } GROUP BY ?parent");
+        
+        final DatasetImpl testDataset = new DatasetImpl();
+        testDataset.addDefaultGraph(this.testContextUri);
+        // switch to a single context to see if that makes a difference
+        // testDataset.addDefaultGraph(this.testInferredContextUri);
+        
+        query.setDataset(testDataset);
+        
+        query.setBinding("parent", this.getTestValueFactory().createURI("http://www.w3.org/2002/07/owl#Thing"));
+        
+        final TupleQueryResult queryResult = query.evaluate();
+        
+        try
+        {
+            Assert.assertTrue(queryResult.hasNext());
+            
+            final AtomicInteger count = new AtomicInteger(0);
+            final AtomicInteger missingParentCount = new AtomicInteger(0);
+            
+            while(queryResult.hasNext())
+            {
+                final BindingSet bindingSet = queryResult.next();
+                
+                this.log.info("nextBinding: {}", bindingSet);
+                
+                // FIXME: This fails for one of the two bindings that comes out
+                // Assert.assertTrue(bindingSet.hasBinding("parent"));
+                if(!bindingSet.hasBinding("parent"))
+                {
+                    missingParentCount.incrementAndGet();
+                }
+                
+                Assert.assertTrue(bindingSet.hasBinding("childCount"));
+                
+                final Literal value = (Literal)bindingSet.getBinding("childCount").getValue();
+                
+                // TODO: 132 is the value returned when property paths are not used, the other
+                // result here, which does not have a parent binding shows a count of 1316
+                // The other binding returns 25 for the minimal set
+                // Assert.assertEquals(132, value.intValue());
+                
+                // FIXME: This is failing for this query for some reason
+                // assertFalse("Should only have been one result binding", queryResult.hasNext());
+                count.incrementAndGet();
+            }
+            
+            Assert.assertEquals("Parent should have been bound to each binding", 0, missingParentCount.get());
+            
+            Assert.assertEquals("There should have only been one result from the query", 0, count.get());
+        }
+        finally
+        {
+            queryResult.close();
+        }
+    }
+    
+    /**
+     * This test still failing
+     * 
+     * @throws Exception
+     */
+    @Test
+    public final void testFromMinimalConcreteTripleTestFileWithoutCountAndGroupBy() throws Exception
+    {
+        this.getTestRepositoryConnection().add(
+                this.getClass().getResourceAsStream("/minimalinferredplantontology-v16.nt"), "", RDFFormat.NTRIPLES,
+                this.testContextUri);
+        this.getTestRepositoryConnection().commit();
+        
+        final TupleQuery query =
+                this.getTestRepositoryConnection()
+                        .prepareTupleQuery(
+                                QueryLanguage.SPARQL,
+                                "SELECT DISTINCT ?parent ?child WHERE { ?child a owl:Class . ?child rdfs:subClassOf+ ?parent . FILTER(isIRI(?child) && isIRI(?parent)) } ORDER BY DESC(?child) LIMIT 10000 OFFSET 0");
+        
+        final DatasetImpl testDataset = new DatasetImpl();
+        testDataset.addDefaultGraph(this.testContextUri);
+        // switch to a single context to see if that makes a difference
+        // testDataset.addDefaultGraph(this.testInferredContextUri);
+        
+        query.setDataset(testDataset);
+        
+        query.setBinding("parent", this.getTestValueFactory().createURI("http://www.w3.org/2002/07/owl#Thing"));
+        
+        final TupleQueryResult queryResult = query.evaluate();
+        
+        try
+        {
+            Assert.assertTrue(queryResult.hasNext());
+            
+            final AtomicInteger count = new AtomicInteger(0);
+            final AtomicInteger missingParentCount = new AtomicInteger(0);
+            
+            while(queryResult.hasNext())
+            {
+                final BindingSet bindingSet = queryResult.next();
+                
+                this.log.info("nextBinding: {}", bindingSet);
+                
+                // FIXME: This fails for one of the two bindings that comes out
+                // Assert.assertTrue(bindingSet.hasBinding("parent"));
+                if(!bindingSet.hasBinding("parent"))
+                {
+                    missingParentCount.incrementAndGet();
+                }
+                
+                Assert.assertTrue(bindingSet.hasBinding("child"));
+                
+                // final Literal value = (Literal)bindingSet.getBinding("childCount").getValue();
+                
+                // TODO: 132 is the value returned when property paths are not used, the other
+                // result here, which does not have a parent binding shows a count of 1316
+                // Assert.assertEquals(132, value.intValue());
+                
+                // FIXME: This is failing for this query for some reason
+                // assertFalse("Should only have been one result binding", queryResult.hasNext());
+                
+                count.incrementAndGet();
+            }
+            
+            Assert.assertEquals(157, count.get());
+            
+            Assert.assertEquals("Parent should have been bound to each binding", 0, missingParentCount.get());
+        }
+        finally
+        {
+            queryResult.close();
+        }
+    }
+    
+    /**
+     * This test still failing
+     * 
+     * @throws Exception
+     */
+    @Test
+    public final void testFromMinimalConcreteTripleTestFileWithoutCountAndGroupByOrFilterIsIRI() throws Exception
+    {
+        this.getTestRepositoryConnection().add(
+                this.getClass().getResourceAsStream("/minimalinferredplantontology-v16.nt"), "", RDFFormat.NTRIPLES,
+                this.testContextUri);
+        this.getTestRepositoryConnection().commit();
+        
+        final TupleQuery query =
+                this.getTestRepositoryConnection()
+                        .prepareTupleQuery(QueryLanguage.SPARQL,
+                                "SELECT ?parent ?child WHERE { ?child a <http://www.w3.org/2002/07/owl#Class> . ?child rdfs:subClassOf+ ?parent . } ");
+        
+        final DatasetImpl testDataset = new DatasetImpl();
+        testDataset.addDefaultGraph(this.testContextUri);
+        // switch to a single context to see if that makes a difference
+        // testDataset.addDefaultGraph(this.testInferredContextUri);
+        
+        query.setDataset(testDataset);
+        
+        query.setBinding("parent", this.getTestValueFactory().createURI("http://www.w3.org/2002/07/owl#Thing"));
+        
+        final TupleQueryResult queryResult = query.evaluate();
+        
+        try
+        {
+            Assert.assertTrue(queryResult.hasNext());
+            
+            final AtomicInteger count = new AtomicInteger(0);
+            final AtomicInteger missingParentCount = new AtomicInteger(0);
+            
+            while(queryResult.hasNext())
+            {
+                final BindingSet bindingSet = queryResult.next();
+                
+                this.log.info("nextBinding: {}", bindingSet);
+                
+                // FIXME: This fails for one of the two bindings that comes out
+                // Assert.assertTrue(bindingSet.hasBinding("parent"));
+                if(!bindingSet.hasBinding("parent"))
+                {
+                    missingParentCount.incrementAndGet();
+                }
+                
+                Assert.assertTrue(bindingSet.hasBinding("child"));
+                
+                // final Literal value = (Literal)bindingSet.getBinding("childCount").getValue();
+                
+                // TODO: 132 is the value returned when property paths are not used, the other
+                // result here, which does not have a parent binding shows a count of 1316
+                // Assert.assertEquals(132, value.intValue());
+                
+                // FIXME: This is failing for this query for some reason
+                // assertFalse("Should only have been one result binding", queryResult.hasNext());
+                
+                count.incrementAndGet();
+            }
+            
+            Assert.assertEquals(157, count.get());
+            
+            Assert.assertEquals("Parent should have been bound to each binding", 0, missingParentCount.get());
+        }
+        finally
+        {
+            queryResult.close();
+        }
+    }
+    
+    /**
+     * This test still failing
+     * 
+     * @throws Exception
+     */
+    @Test
+    public final void testFromReducedConcreteTripleTestFile() throws Exception
+    {
+        this.getTestRepositoryConnection().add(
+                this.getClass().getResourceAsStream("/reducedinferredplantontology-v16.nt"), "", RDFFormat.NTRIPLES,
+                this.testContextUri);
+        this.getTestRepositoryConnection().commit();
+        
+        final TupleQuery query =
+                this.getTestRepositoryConnection()
+                        .prepareTupleQuery(
+                                QueryLanguage.SPARQL,
+                                "SELECT DISTINCT ?parent (COUNT(DISTINCT ?child) AS ?childCount) WHERE { ?child a <http://www.w3.org/2002/07/owl#Class> . ?child <http://www.w3.org/2000/01/rdf-schema#subClassOf>+ ?parent . FILTER(isIRI(?child) && isIRI(?parent)) } GROUP BY ?parent");
+        
+        final DatasetImpl testDataset = new DatasetImpl();
+        testDataset.addDefaultGraph(this.testContextUri);
+        // switch to a single context to see if that makes a difference
+        // testDataset.addDefaultGraph(this.testInferredContextUri);
+        
+        query.setDataset(testDataset);
+        
+        query.setBinding("parent", this.getTestValueFactory().createURI("http://www.w3.org/2002/07/owl#Thing"));
+        
+        final TupleQueryResult queryResult = query.evaluate();
+        
+        try
+        {
+            Assert.assertTrue(queryResult.hasNext());
+            
+            while(queryResult.hasNext())
+            {
+                final BindingSet bindingSet = queryResult.next();
+                
+                this.log.info("nextBinding: {}", bindingSet);
+                
+                // FIXME: This fails for one of the two bindings that comes out
+                Assert.assertTrue(bindingSet.hasBinding("parent"));
+                
+                Assert.assertTrue(bindingSet.hasBinding("childCount"));
+                
+                final Literal value = (Literal)bindingSet.getBinding("childCount").getValue();
+                
+                // TODO: 132 is the value returned when property paths are not used, the other
+                // result here, which does not have a parent binding shows a count of 1316
+                Assert.assertEquals(132, value.intValue());
+                
+                // FIXME: This is failing for this query for some reason
+                // assertFalse("Should only have been one result binding", queryResult.hasNext());
+            }
+        }
+        finally
+        {
+            queryResult.close();
+        }
+    }
+    
+    /**
+     * This test still failing
+     * 
+     * @throws Exception
+     */
+    @Test
+    public final void testFromSimpleConcreteTripleTestFileWithCountAndGroupBy() throws Exception
+    {
+        this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/simpletestfile.nt"), "",
+                RDFFormat.NTRIPLES, this.testContextUri);
+        this.getTestRepositoryConnection().commit();
+        
+        final TupleQuery query =
+                this.getTestRepositoryConnection()
+                        .prepareTupleQuery(
+                                QueryLanguage.SPARQL,
+                                "SELECT DISTINCT ?parent (COUNT(DISTINCT ?child) AS ?childCount) WHERE { ?child a <http://www.w3.org/2002/07/owl#Class> . ?child <http://www.w3.org/2000/01/rdf-schema#subClassOf>+ ?parent . FILTER(isIRI(?child) && isIRI(?parent)) } GROUP BY ?parent");
+        
+        final DatasetImpl testDataset = new DatasetImpl();
+        testDataset.addDefaultGraph(this.testContextUri);
+        // switch to a single context to see if that makes a difference
+        // testDataset.addDefaultGraph(this.testInferredContextUri);
+        
+        query.setDataset(testDataset);
+        
+        query.setBinding("parent", this.getTestValueFactory().createURI("http://www.w3.org/2002/07/owl#Thing"));
+        
+        final TupleQueryResult queryResult = query.evaluate();
+        
+        try
+        {
+            Assert.assertTrue(queryResult.hasNext());
+            
+            final AtomicInteger missingParentCount = new AtomicInteger(0);
+            
+            while(queryResult.hasNext())
+            {
+                final BindingSet bindingSet = queryResult.next();
+                
+                this.log.info("nextBinding: {}", bindingSet);
+                
+                // FIXME: This fails for one of the two bindings that comes out
+                // Assert.assertTrue(bindingSet.hasBinding("parent"));
+                
+                Assert.assertTrue(bindingSet.hasBinding("childCount"));
+                
+                final Literal value = (Literal)bindingSet.getBinding("childCount").getValue();
+                
+                // TODO: 132 is the value returned when property paths are not used, the other
+                // result here, which does not have a parent binding shows a count of 1316
+                Assert.assertEquals(4, value.intValue());
+                
+                // FIXME: This fails for one of the two bindings that comes out
+                // Do this check after the check on childCount to verify that the count is correct
+                // in this case
+                // Assert.assertTrue(bindingSet.hasBinding("parent"));
+                if(!bindingSet.hasBinding("parent"))
+                {
+                    missingParentCount.incrementAndGet();
+                }
+                
+                // FIXME: This is failing for this query for some reason
+                Assert.assertFalse("Should only have been one result binding", queryResult.hasNext());
+            }
+            
+            Assert.assertEquals("Parent should have been bound to each binding", 0, missingParentCount.get());
+        }
+        finally
+        {
+            queryResult.close();
+        }
+    }
+    
+    /**
+     * This test still failing
+     * 
+     * @throws Exception
+     */
+    @Test
+    public final void testFromSimpleConcreteTripleTestFileWithOnlyPropertyPathAndQuerySetBinding() throws Exception
+    {
+        this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/simpletestfile.nt"), "",
+                RDFFormat.NTRIPLES, this.testContextUri);
+        this.getTestRepositoryConnection().commit();
+        
+        final TupleQuery query = this.getTestRepositoryConnection().prepareTupleQuery(QueryLanguage.SPARQL,
+        // "SELECT ?parent ?child WHERE { ?child a <http://www.w3.org/2002/07/owl#Class> . ?child rdfs:subClassOf+ ?parent . } ");
+                "SELECT ?parent ?child WHERE { ?child rdfs:subClassOf+ ?parent . } ");
+        
+        // The bug appears even if the dataset is not replaced
+        final DatasetImpl testDataset = new DatasetImpl();
+        testDataset.addDefaultGraph(this.testContextUri);
+        // switch to a single context to see if that makes a difference
+        // testDataset.addDefaultGraph(this.testInferredContextUri);
+        query.setDataset(testDataset);
+        
+        query.setBinding("parent", this.getTestValueFactory().createURI("http://www.w3.org/2002/07/owl#Thing"));
+        
+        final TupleQueryResult queryResult = query.evaluate();
+        
+        try
+        {
+            Assert.assertTrue(queryResult.hasNext());
+            
+            final AtomicInteger count = new AtomicInteger(0);
+            final AtomicInteger missingParentCount = new AtomicInteger(0);
+            
+            while(queryResult.hasNext())
+            {
+                final BindingSet bindingSet = queryResult.next();
+                
+                this.log.info("nextBinding: {}", bindingSet);
+                
+                // FIXME: This fails for one of the two bindings that comes out
+                // Assert.assertTrue(bindingSet.hasBinding("parent"));
+                
+                if(!bindingSet.hasBinding("parent"))
+                {
+                    missingParentCount.incrementAndGet();
+                }
+                
+                Assert.assertTrue(bindingSet.hasBinding("child"));
+                
+                // final Literal value = (Literal)bindingSet.getBinding("childCount").getValue();
+                
+                // TODO: 132 is the value returned when property paths are not used, the other
+                // result here, which does not have a parent binding shows a count of 1316
+                // Assert.assertEquals(132, value.intValue());
+                
+                // FIXME: This is failing for this query for some reason
+                // assertFalse("Should only have been one result binding", queryResult.hasNext());
+                
+                count.incrementAndGet();
+            }
+            
+            Assert.assertEquals(4, count.get());
+            
+            Assert.assertEquals("Parent should have been bound to each binding", 0, missingParentCount.get());
+        }
+        finally
+        {
+            queryResult.close();
+        }
+    }
+    
+    /**
+     * This test still failing
+     * 
+     * @throws Exception
+     */
+    @Test
+    public final void testFromSimpleConcreteTripleTestFileWithOnlyPropertyPathAndQuerySetBindingWithChildClass()
+        throws Exception
+    {
+        this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/simpletestfile.nt"), "",
+                RDFFormat.NTRIPLES, this.testContextUri);
+        this.getTestRepositoryConnection().commit();
+        
+        final TupleQuery query =
+                this.getTestRepositoryConnection()
+                        .prepareTupleQuery(QueryLanguage.SPARQL,
+                                "SELECT ?parent ?child WHERE { ?child a <http://www.w3.org/2002/07/owl#Class> . ?child rdfs:subClassOf+ ?parent . } ");
+        // "SELECT ?parent ?child WHERE { ?child rdfs:subClassOf+ ?parent . } ");
+        
+        // The bug appears even if the dataset is not replaced
+        final DatasetImpl testDataset = new DatasetImpl();
+        testDataset.addDefaultGraph(this.testContextUri);
+        // switch to a single context to see if that makes a difference
+        // testDataset.addDefaultGraph(this.testInferredContextUri);
+        query.setDataset(testDataset);
+        
+        query.setBinding("parent", this.getTestValueFactory().createURI("http://www.w3.org/2002/07/owl#Thing"));
+        
+        final TupleQueryResult queryResult = query.evaluate();
+        
+        try
+        {
+            Assert.assertTrue(queryResult.hasNext());
+            
+            final AtomicInteger count = new AtomicInteger(0);
+            final AtomicInteger missingParentCount = new AtomicInteger(0);
+            
+            while(queryResult.hasNext())
+            {
+                final BindingSet bindingSet = queryResult.next();
+                
+                this.log.info("nextBinding: {}", bindingSet);
+                
+                // FIXME: This fails for one of the two bindings that comes out
+                // Assert.assertTrue(bindingSet.hasBinding("parent"));
+                
+                if(!bindingSet.hasBinding("parent"))
+                {
+                    missingParentCount.incrementAndGet();
+                }
+                
+                Assert.assertTrue(bindingSet.hasBinding("child"));
+                
+                // final Literal value = (Literal)bindingSet.getBinding("childCount").getValue();
+                
+                // TODO: 132 is the value returned when property paths are not used, the other
+                // result here, which does not have a parent binding shows a count of 1316
+                // Assert.assertEquals(132, value.intValue());
+                
+                // FIXME: This is failing for this query for some reason
+                // assertFalse("Should only have been one result binding", queryResult.hasNext());
+                
+                count.incrementAndGet();
+            }
+            
+            Assert.assertEquals(4, count.get());
+            
+            Assert.assertEquals("Parent should have been bound to each binding", 0, missingParentCount.get());
+        }
+        finally
+        {
+            queryResult.close();
+        }
+    }
+    
+    /**
+     * This test still failing
+     * 
+     * @throws Exception
+     */
+    @Test
+    public final void testFromSimpleConcreteTripleTestFileWithoutCountAndGroupBy() throws Exception
+    {
+        this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/simpletestfile.nt"), "",
+                RDFFormat.NTRIPLES, this.testContextUri);
+        this.getTestRepositoryConnection().commit();
+        
+        final TupleQuery query =
+                this.getTestRepositoryConnection()
+                        .prepareTupleQuery(
+                                QueryLanguage.SPARQL,
+                                "SELECT DISTINCT ?parent ?child WHERE { ?child a <http://www.w3.org/2002/07/owl#Class> . ?child rdfs:subClassOf+ ?parent . FILTER(isIRI(?child) && isIRI(?parent)) } ORDER BY DESC(?child) LIMIT 10000 OFFSET 0");
+        
+        // The bug appears even if the dataset is not replaced
+        final DatasetImpl testDataset = new DatasetImpl();
+        testDataset.addDefaultGraph(this.testContextUri);
+        // switch to a single context to see if that makes a difference
+        // testDataset.addDefaultGraph(this.testInferredContextUri);
+        query.setDataset(testDataset);
+        
+        query.setBinding("parent", this.getTestValueFactory().createURI("http://www.w3.org/2002/07/owl#Thing"));
+        
+        final TupleQueryResult queryResult = query.evaluate();
+        
+        try
+        {
+            Assert.assertTrue(queryResult.hasNext());
+            
+            final AtomicInteger count = new AtomicInteger(0);
+            final AtomicInteger missingParentCount = new AtomicInteger(0);
+            
+            while(queryResult.hasNext())
+            {
+                final BindingSet bindingSet = queryResult.next();
+                
+                this.log.info("nextBinding: {}", bindingSet);
+                
+                // FIXME: This fails for one of the two bindings that comes out
+                // Assert.assertTrue(bindingSet.hasBinding("parent"));
+                
+                if(!bindingSet.hasBinding("parent"))
+                {
+                    missingParentCount.incrementAndGet();
+                }
+                
+                Assert.assertTrue(bindingSet.hasBinding("child"));
+                
+                // final Literal value = (Literal)bindingSet.getBinding("childCount").getValue();
+                
+                // TODO: 132 is the value returned when property paths are not used, the other
+                // result here, which does not have a parent binding shows a count of 1316
+                // Assert.assertEquals(132, value.intValue());
+                
+                // FIXME: This is failing for this query for some reason
+                // assertFalse("Should only have been one result binding", queryResult.hasNext());
+                
+                count.incrementAndGet();
+            }
+            
+            Assert.assertEquals(4, count.get());
+            
+            Assert.assertEquals("Parent should have been bound to each binding", 0, missingParentCount.get());
+        }
+        finally
+        {
+            queryResult.close();
+        }
+    }
+    
+    /**
+     * This method attempts to generate a minimal set of triples for this test case.
+     * 
+     * Unignore this method and change the file output location to regenerate more similar test
+     * files.
+     * 
+     * @throws Exception
+     */
+    @Ignore
+    @Test
+    public final void testGenerateMinimalConcreteTripleTestFile() throws Exception
+    {
+        this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/inferredplantontology-v16.nt"),
+                "", RDFFormat.NTRIPLES, this.testContextUri);
+        this.getTestRepositoryConnection().commit();
+        
+        // Dump to a concrete set of triples to narrow down the cause
+        final RDFWriter writer =
+                Rio.createWriter(RDFFormat.NTRIPLES, new FileOutputStream(
+                        "/home/peter/temp/minimalinferredplantontology-v16.nt"));
+        
+        // GraphQuery query =
+        // this.getTestRepositoryConnection().prepareGraphQuery(QueryLanguage.SPARQL,
+        // "CONSTRUCT { ?parent a ?parentType . ?class a ?childType . ?class <http://www.w3.org/2000/01/rdf-schema#subClassOf> ?parent . } WHERE { ?class <http://www.w3.org/2000/01/rdf-schema#subClassOf> ?parent . OPTIONAL { ?parent a ?parentType . } OPTIONAL { ?class a ?childType . } } ORDER BY ?parent");
+        final GraphQuery query =
+                this.getTestRepositoryConnection()
+                        .prepareGraphQuery(
+                                QueryLanguage.SPARQL,
+                                "CONSTRUCT { ?parent a ?parentType . ?child a ?childType . ?child <http://www.w3.org/2000/01/rdf-schema#subClassOf> ?parent . } WHERE { ?child <http://www.w3.org/2000/01/rdf-schema#subClassOf> ?parent . OPTIONAL { ?parent a ?parentType . } OPTIONAL { ?child a ?childType . } FILTER(isIRI(?child) && isIRI(?parent))} ORDER BY DESC(?parent) OFFSET 0 LIMIT 1000");
+        
+        query.evaluate(writer);
+    }
+    
+    /**
+     * Use this method to load up all of the concrete triples and then export the interesting
+     * statements to a reduced file.
+     * 
+     * @throws Exception
+     */
+    @Ignore
+    @Test
+    public final void testGenerateReducedConcreteTriplesTestFile() throws Exception
+    {
+        this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/inferredplantontology-v16.nt"),
+                "", RDFFormat.NTRIPLES, this.testContextUri);
+        this.getTestRepositoryConnection().commit();
+        
+        // Dump to a concrete set of triples to narrow down the cause
+        final RDFWriter writer =
+                Rio.createWriter(RDFFormat.NTRIPLES, new FileOutputStream(
+                        "/home/peter/temp/reducedinferredplantontology-v16.nt"));
+        
+        final GraphQuery query =
+                this.getTestRepositoryConnection()
+                        .prepareGraphQuery(
+                                QueryLanguage.SPARQL,
+                                "CONSTRUCT { ?parent a ?parentType . ?class a ?childType . ?class <http://www.w3.org/2000/01/rdf-schema#subClassOf> ?parent . } WHERE { ?class <http://www.w3.org/2000/01/rdf-schema#subClassOf> ?parent . OPTIONAL { ?parent a ?parentType . } OPTIONAL { ?class a ?childType . } }");
+        
+        query.evaluate(writer);
     }
 }
