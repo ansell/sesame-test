@@ -142,6 +142,7 @@ public class PossibleSesameBugTest extends AbstractSesameTest
             }
         }
         
+        // Uncomment the following code lines to dump the fully inferred ontology file at this point.
         // Dump to a concrete set of triples to narrow down the cause
         // RDFWriter writer = Rio.createWriter(RDFFormat.NTRIPLES, new
         // FileOutputStream("/home/peter/temp/inferredplantontology-v16.nt"));
@@ -173,19 +174,15 @@ public class PossibleSesameBugTest extends AbstractSesameTest
                 
                 this.log.info("nextBinding: {}", bindingSet);
                 
-                // FIXME: This fails for one of the two bindings that comes out
                 Assert.assertTrue(bindingSet.hasBinding("parent"));
                 
                 Assert.assertTrue(bindingSet.hasBinding("childCount"));
                 
                 final Literal value = (Literal)bindingSet.getBinding("childCount").getValue();
                 
-                // TODO: 132 is the value returned when property paths are not used, the other
-                // result here, which does not have a parent binding shows a count of 1316
-                Assert.assertEquals(132, value.intValue());
+                Assert.assertEquals(1448, value.intValue());
                 
-                // FIXME: This is failing for this query for some reason
-                // assertFalse("Should only have been one result binding", queryResult.hasNext());
+                Assert.assertFalse("Should only have been one result binding", queryResult.hasNext());
             }
         }
         finally
@@ -233,19 +230,15 @@ public class PossibleSesameBugTest extends AbstractSesameTest
                 
                 this.log.info("nextBinding: {}", bindingSet);
                 
-                // FIXME: This fails for one of the two bindings that comes out
                 Assert.assertTrue(bindingSet.hasBinding("parent"));
                 
                 Assert.assertTrue(bindingSet.hasBinding("childCount"));
                 
                 final Literal value = (Literal)bindingSet.getBinding("childCount").getValue();
                 
-                // TODO: 132 is the value returned when property paths are not used, the other
-                // result here, which does not have a parent binding shows a count of 1316
-                Assert.assertEquals(132, value.intValue());
+                Assert.assertEquals(1448, value.intValue());
                 
-                // FIXME: This is failing for this query for some reason
-                // assertFalse("Should only have been one result binding", queryResult.hasNext());
+                Assert.assertFalse("Should only have been one result binding", queryResult.hasNext());
             }
         }
         finally
@@ -259,7 +252,6 @@ public class PossibleSesameBugTest extends AbstractSesameTest
      * 
      * @throws Exception
      */
-    @Ignore
     @Test
     public final void testFromGrepReducedConcreteTripleTestFile() throws Exception
     {
@@ -295,19 +287,15 @@ public class PossibleSesameBugTest extends AbstractSesameTest
                 
                 this.log.info("nextBinding: {}", bindingSet);
                 
-                // FIXME: This fails for the only binding that comes out of this hand crafted file
                 Assert.assertTrue(bindingSet.hasBinding("parent"));
                 
                 Assert.assertTrue(bindingSet.hasBinding("childCount"));
                 
                 final Literal value = (Literal)bindingSet.getBinding("childCount").getValue();
                 
-                // TODO: 132 is the value returned when property paths are not used, the other
-                // result here, which does not have a parent binding shows a count of 1316
-                Assert.assertEquals(132, value.intValue());
+                Assert.assertEquals(2, value.intValue());
                 
-                // FIXME: This is failing for this query for some reason
-                // assertFalse("Should only have been one result binding", queryResult.hasNext());
+                Assert.assertFalse("Should only have been one result binding", queryResult.hasNext());
             }
         }
         finally
@@ -359,8 +347,6 @@ public class PossibleSesameBugTest extends AbstractSesameTest
                 
                 this.log.info("nextBinding: {}", bindingSet);
                 
-                // FIXME: This fails for one of the two bindings that comes out
-                // Assert.assertTrue(bindingSet.hasBinding("parent"));
                 if(!bindingSet.hasBinding("parent"))
                 {
                     missingParentCount.incrementAndGet();
@@ -370,19 +356,15 @@ public class PossibleSesameBugTest extends AbstractSesameTest
                 
                 final Literal value = (Literal)bindingSet.getBinding("childCount").getValue();
                 
-                // TODO: 132 is the value returned when property paths are not used, the other
-                // result here, which does not have a parent binding shows a count of 1316
-                // The other binding returns 25 for the minimal set
-                // Assert.assertEquals(132, value.intValue());
+                Assert.assertEquals(157, value.intValue());
                 
-                // FIXME: This is failing for this query for some reason
-                // assertFalse("Should only have been one result binding", queryResult.hasNext());
+                Assert.assertFalse("Should only have been one result binding", queryResult.hasNext());
                 count.incrementAndGet();
             }
             
             Assert.assertEquals("Parent should have been bound to each binding", 0, missingParentCount.get());
             
-            Assert.assertEquals("There should have only been one result from the query", 0, count.get());
+            Assert.assertEquals("There should have only been one result from the query", 1, count.get());
         }
         finally
         {
@@ -433,23 +415,13 @@ public class PossibleSesameBugTest extends AbstractSesameTest
                 
                 this.log.info("nextBinding: {}", bindingSet);
                 
-                // FIXME: This fails for one of the two bindings that comes out
-                // Assert.assertTrue(bindingSet.hasBinding("parent"));
+                Assert.assertTrue(bindingSet.hasBinding("parent"));
                 if(!bindingSet.hasBinding("parent"))
                 {
                     missingParentCount.incrementAndGet();
                 }
                 
                 Assert.assertTrue(bindingSet.hasBinding("child"));
-                
-                // final Literal value = (Literal)bindingSet.getBinding("childCount").getValue();
-                
-                // TODO: 132 is the value returned when property paths are not used, the other
-                // result here, which does not have a parent binding shows a count of 1316
-                // Assert.assertEquals(132, value.intValue());
-                
-                // FIXME: This is failing for this query for some reason
-                // assertFalse("Should only have been one result binding", queryResult.hasNext());
                 
                 count.incrementAndGet();
             }
@@ -506,23 +478,14 @@ public class PossibleSesameBugTest extends AbstractSesameTest
                 
                 this.log.info("nextBinding: {}", bindingSet);
                 
-                // FIXME: This fails for one of the two bindings that comes out
-                // Assert.assertTrue(bindingSet.hasBinding("parent"));
+                Assert.assertTrue(bindingSet.hasBinding("parent"));
+                
                 if(!bindingSet.hasBinding("parent"))
                 {
                     missingParentCount.incrementAndGet();
                 }
                 
                 Assert.assertTrue(bindingSet.hasBinding("child"));
-                
-                // final Literal value = (Literal)bindingSet.getBinding("childCount").getValue();
-                
-                // TODO: 132 is the value returned when property paths are not used, the other
-                // result here, which does not have a parent binding shows a count of 1316
-                // Assert.assertEquals(132, value.intValue());
-                
-                // FIXME: This is failing for this query for some reason
-                // assertFalse("Should only have been one result binding", queryResult.hasNext());
                 
                 count.incrementAndGet();
             }
@@ -579,23 +542,13 @@ public class PossibleSesameBugTest extends AbstractSesameTest
                 
                 this.log.info("nextBinding: {}", bindingSet);
                 
-                // FIXME: This fails for one of the two bindings that comes out
-                // Assert.assertTrue(bindingSet.hasBinding("parent"));
+                Assert.assertTrue(bindingSet.hasBinding("parent"));
                 if(!bindingSet.hasBinding("parent"))
                 {
                     missingParentCount.incrementAndGet();
                 }
                 
                 Assert.assertTrue(bindingSet.hasBinding("child"));
-                
-                // final Literal value = (Literal)bindingSet.getBinding("childCount").getValue();
-                
-                // TODO: 132 is the value returned when property paths are not used, the other
-                // result here, which does not have a parent binding shows a count of 1316
-                // Assert.assertEquals(132, value.intValue());
-                
-                // FIXME: This is failing for this query for some reason
-                // assertFalse("Should only have been one result binding", queryResult.hasNext());
                 
                 count.incrementAndGet();
             }
@@ -650,19 +603,15 @@ public class PossibleSesameBugTest extends AbstractSesameTest
                 
                 this.log.info("nextBinding: {}", bindingSet);
                 
-                // FIXME: This fails for one of the two bindings that comes out
                 Assert.assertTrue(bindingSet.hasBinding("parent"));
                 
                 Assert.assertTrue(bindingSet.hasBinding("childCount"));
                 
                 final Literal value = (Literal)bindingSet.getBinding("childCount").getValue();
                 
-                // TODO: 132 is the value returned when property paths are not used, the other
-                // result here, which does not have a parent binding shows a count of 1316
-                Assert.assertEquals(132, value.intValue());
+                Assert.assertEquals(1448, value.intValue());
                 
-                // FIXME: This is failing for this query for some reason
-                // assertFalse("Should only have been one result binding", queryResult.hasNext());
+                Assert.assertFalse("Should only have been one result binding", queryResult.hasNext());
             }
         }
         finally
@@ -712,27 +661,20 @@ public class PossibleSesameBugTest extends AbstractSesameTest
                 
                 this.log.info("nextBinding: {}", bindingSet);
                 
-                // FIXME: This fails for one of the two bindings that comes out
-                // Assert.assertTrue(bindingSet.hasBinding("parent"));
+                Assert.assertTrue(bindingSet.hasBinding("parent"));
                 
                 Assert.assertTrue(bindingSet.hasBinding("childCount"));
                 
                 final Literal value = (Literal)bindingSet.getBinding("childCount").getValue();
                 
-                // TODO: 132 is the value returned when property paths are not used, the other
-                // result here, which does not have a parent binding shows a count of 1316
                 Assert.assertEquals(4, value.intValue());
                 
-                // FIXME: This fails for one of the two bindings that comes out
-                // Do this check after the check on childCount to verify that the count is correct
-                // in this case
-                // Assert.assertTrue(bindingSet.hasBinding("parent"));
+                Assert.assertTrue(bindingSet.hasBinding("parent"));
                 if(!bindingSet.hasBinding("parent"))
                 {
                     missingParentCount.incrementAndGet();
                 }
                 
-                // FIXME: This is failing for this query for some reason
                 Assert.assertFalse("Should only have been one result binding", queryResult.hasNext());
             }
             
@@ -784,8 +726,7 @@ public class PossibleSesameBugTest extends AbstractSesameTest
                 
                 this.log.info("nextBinding: {}", bindingSet);
                 
-                // FIXME: This fails for one of the two bindings that comes out
-                // Assert.assertTrue(bindingSet.hasBinding("parent"));
+                Assert.assertTrue(bindingSet.hasBinding("parent"));
                 
                 if(!bindingSet.hasBinding("parent"))
                 {
@@ -793,15 +734,6 @@ public class PossibleSesameBugTest extends AbstractSesameTest
                 }
                 
                 Assert.assertTrue(bindingSet.hasBinding("child"));
-                
-                // final Literal value = (Literal)bindingSet.getBinding("childCount").getValue();
-                
-                // TODO: 132 is the value returned when property paths are not used, the other
-                // result here, which does not have a parent binding shows a count of 1316
-                // Assert.assertEquals(132, value.intValue());
-                
-                // FIXME: This is failing for this query for some reason
-                // assertFalse("Should only have been one result binding", queryResult.hasNext());
                 
                 count.incrementAndGet();
             }
@@ -859,8 +791,7 @@ public class PossibleSesameBugTest extends AbstractSesameTest
                 
                 this.log.info("nextBinding: {}", bindingSet);
                 
-                // FIXME: This fails for one of the two bindings that comes out
-                // Assert.assertTrue(bindingSet.hasBinding("parent"));
+                Assert.assertTrue(bindingSet.hasBinding("parent"));
                 
                 if(!bindingSet.hasBinding("parent"))
                 {
@@ -868,15 +799,6 @@ public class PossibleSesameBugTest extends AbstractSesameTest
                 }
                 
                 Assert.assertTrue(bindingSet.hasBinding("child"));
-                
-                // final Literal value = (Literal)bindingSet.getBinding("childCount").getValue();
-                
-                // TODO: 132 is the value returned when property paths are not used, the other
-                // result here, which does not have a parent binding shows a count of 1316
-                // Assert.assertEquals(132, value.intValue());
-                
-                // FIXME: This is failing for this query for some reason
-                // assertFalse("Should only have been one result binding", queryResult.hasNext());
                 
                 count.incrementAndGet();
             }
@@ -933,8 +855,7 @@ public class PossibleSesameBugTest extends AbstractSesameTest
                 
                 this.log.info("nextBinding: {}", bindingSet);
                 
-                // FIXME: This fails for one of the two bindings that comes out
-                // Assert.assertTrue(bindingSet.hasBinding("parent"));
+                Assert.assertTrue(bindingSet.hasBinding("parent"));
                 
                 if(!bindingSet.hasBinding("parent"))
                 {
@@ -942,15 +863,6 @@ public class PossibleSesameBugTest extends AbstractSesameTest
                 }
                 
                 Assert.assertTrue(bindingSet.hasBinding("child"));
-                
-                // final Literal value = (Literal)bindingSet.getBinding("childCount").getValue();
-                
-                // TODO: 132 is the value returned when property paths are not used, the other
-                // result here, which does not have a parent binding shows a count of 1316
-                // Assert.assertEquals(132, value.intValue());
-                
-                // FIXME: This is failing for this query for some reason
-                // assertFalse("Should only have been one result binding", queryResult.hasNext());
                 
                 count.incrementAndGet();
             }
