@@ -17,7 +17,7 @@
 #################################################################
 
 
-:artifactHasTopObject rdf:type owl:AnnotationProperty ;
+:artifactHasTopObject rdf:type owl:ObjectProperty ;
                         
                         rdfs:range :MyTopObject ;
                         
@@ -53,9 +53,9 @@
 
 :MyTopObject rdf:type owl:Class ;
                
-               rdfs:subClassOf :MyObject .
+               rdfs:subClassOf :MyObject ;
 
-
+			owl:disjointWith :NotATopObject .
 
 ###  #NotATopObject
 
