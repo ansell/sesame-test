@@ -26,6 +26,7 @@ import org.openrdf.query.TupleQueryResult;
 import org.openrdf.query.impl.DatasetImpl;
 import org.openrdf.repository.util.RDFInserter;
 import org.semanticweb.owlapi.formats.RDFXMLOntologyFormatFactory;
+import org.semanticweb.owlapi.formats.TurtleOntologyFormatFactory;
 import org.semanticweb.owlapi.io.StreamDocumentSource;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
@@ -75,7 +76,7 @@ public class PoddArtifactHasTopObjectTest extends AbstractSesameTest
         
         this.parsedOntology =
                 this.manager.loadOntologyFromOntologyDocument(new StreamDocumentSource(this.getClass()
-                        .getResourceAsStream("/podd-artifact-has-top-object.rdf"), new RDFXMLOntologyFormatFactory()));
+                        .getResourceAsStream("/podd-artifact-has-top-object.ttl"), new TurtleOntologyFormatFactory()));
         
         Assert.assertFalse(this.parsedOntology.isEmpty());
         
@@ -90,7 +91,7 @@ public class PoddArtifactHasTopObjectTest extends AbstractSesameTest
         renderer.render();
         this.getTestRepositoryConnection().commit();
         
-        Assert.assertEquals(13, this.getTestRepositoryConnection().size(this.testContextUri));
+        Assert.assertEquals(14, this.getTestRepositoryConnection().size(this.testContextUri));
         
         final String reasonerName = "Pellet";
         final OWLReasonerFactory configuredReasoner =
