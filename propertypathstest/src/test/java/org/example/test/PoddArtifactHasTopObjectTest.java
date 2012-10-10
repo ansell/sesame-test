@@ -79,7 +79,7 @@ public class PoddArtifactHasTopObjectTest extends AbstractSesameTest
         
         this.parsedOntology =
                 this.manager.loadOntologyFromOntologyDocument(new StreamDocumentSource(this.getClass()
-                        .getResourceAsStream("/podd-artifact-has-top-object.ttl"), new TurtleOntologyFormatFactory()));
+                        .getResourceAsStream("/error-podd-artifact-has-top-object.ttl"), new TurtleOntologyFormatFactory()));
         
         Assert.assertFalse(this.parsedOntology.isEmpty());
         
