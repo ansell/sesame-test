@@ -62,9 +62,9 @@ public class TurtleBaseParsingTest extends AbstractSesameTest
         
         Statement st = asList.get(0);
         
-        Assert.assertEquals(this.getTestValueFactory().createURI("http://test.org/path#a1"), st.getSubject());
-        Assert.assertEquals(this.getTestValueFactory().createURI("http://test.org/path#b1"), st.getPredicate());
-        Assert.assertEquals(this.getTestValueFactory().createURI("http://test.org/path#c1"), st.getObject());
+        Assert.assertEquals(this.getTestValueFactory().createURI("http://test.org/a1"), st.getSubject());
+        Assert.assertEquals(this.getTestValueFactory().createURI("http://test.org/b1"), st.getPredicate());
+        Assert.assertEquals(this.getTestValueFactory().createURI("http://test.org/c1"), st.getObject());
         
     }
     
