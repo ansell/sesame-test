@@ -37,7 +37,7 @@ public class GeneOntologyPropertyPathTest extends AbstractSesameTest
         
         this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/geneontologysample1.n3"),
                 "http://test.example.org/", RDFFormat.N3);
-        
+        this.getTestRepositoryConnection().commit();
         Assert.assertEquals(58053, this.getTestRepositoryConnection().size());
     }
     
