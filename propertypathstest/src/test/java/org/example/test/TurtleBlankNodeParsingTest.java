@@ -49,7 +49,7 @@ public class TurtleBlankNodeParsingTest extends AbstractSesameTest
     {
         this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/testBlankNodes.ttl"), "",
                 RDFFormat.TURTLE);
-        
+        this.getTestRepositoryConnection().commit();
         Assert.assertEquals(9, this.getTestRepositoryConnection().size());
         
     }
@@ -59,7 +59,7 @@ public class TurtleBlankNodeParsingTest extends AbstractSesameTest
     {
         this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/testBlankNodes-10.ttl"), "",
                 RDFFormat.TURTLE);
-        
+        this.getTestRepositoryConnection().commit();
         Assert.assertEquals(1, this.getTestRepositoryConnection().size());
         
     }
@@ -69,7 +69,7 @@ public class TurtleBlankNodeParsingTest extends AbstractSesameTest
     {
         this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/testBlankNodes-11.ttl"), "",
                 RDFFormat.TURTLE);
-        
+        this.getTestRepositoryConnection().commit();
         Assert.assertEquals(1, this.getTestRepositoryConnection().size());
         
     }
@@ -79,7 +79,7 @@ public class TurtleBlankNodeParsingTest extends AbstractSesameTest
     {
         this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/testBlankNodes-2.ttl"), "",
                 RDFFormat.TURTLE);
-        
+        this.getTestRepositoryConnection().commit();
         Assert.assertEquals(8, this.getTestRepositoryConnection().size());
         
     }
@@ -89,7 +89,7 @@ public class TurtleBlankNodeParsingTest extends AbstractSesameTest
     {
         this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/testBlankNodes-3.ttl"), "",
                 RDFFormat.TURTLE);
-        
+        this.getTestRepositoryConnection().commit();
         Assert.assertEquals(2, this.getTestRepositoryConnection().size());
         
     }
@@ -99,7 +99,7 @@ public class TurtleBlankNodeParsingTest extends AbstractSesameTest
     {
         this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/testBlankNodes-4.ttl"), "",
                 RDFFormat.TURTLE);
-        
+        this.getTestRepositoryConnection().commit();
         Assert.assertEquals(1, this.getTestRepositoryConnection().size());
         
     }
@@ -109,7 +109,7 @@ public class TurtleBlankNodeParsingTest extends AbstractSesameTest
     {
         this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/testBlankNodes-5.ttl"), "",
                 RDFFormat.TURTLE);
-        
+        this.getTestRepositoryConnection().commit();
         Assert.assertEquals(1, this.getTestRepositoryConnection().size());
         
     }
@@ -119,7 +119,7 @@ public class TurtleBlankNodeParsingTest extends AbstractSesameTest
     {
         this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/testBlankNodes-6.ttl"), "",
                 RDFFormat.TURTLE);
-        
+        this.getTestRepositoryConnection().commit();
         Assert.assertEquals(1, this.getTestRepositoryConnection().size());
         
     }
@@ -129,7 +129,7 @@ public class TurtleBlankNodeParsingTest extends AbstractSesameTest
     {
         this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/testBlankNodes-7.ttl"), "",
                 RDFFormat.TURTLE);
-        
+        this.getTestRepositoryConnection().commit();
         Assert.assertEquals(1, this.getTestRepositoryConnection().size());
         
     }
@@ -139,7 +139,7 @@ public class TurtleBlankNodeParsingTest extends AbstractSesameTest
     {
         this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/testBlankNodes-8.ttl"), "",
                 RDFFormat.TURTLE);
-        
+        this.getTestRepositoryConnection().commit();
         Assert.assertEquals(1, this.getTestRepositoryConnection().size());
         
     }
@@ -149,7 +149,7 @@ public class TurtleBlankNodeParsingTest extends AbstractSesameTest
     {
         this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/testBlankNodes-9.ttl"), "",
                 RDFFormat.TURTLE);
-        
+        this.getTestRepositoryConnection().commit();
         Assert.assertEquals(1, this.getTestRepositoryConnection().size());
         
     }
