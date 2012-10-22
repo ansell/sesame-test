@@ -62,14 +62,17 @@ public class OWLPrimerParsingTest extends AbstractSesameTest
         this.getTestRepositoryConnection().add(
                 this.getClass().getResourceAsStream("/primer.owlapitestresource.turtle.rdf"), "", RDFFormat.TURTLE,
                 owlapiTurtleContext);
+        this.getTestRepositoryConnection().commit();
         Assert.assertEquals(280, this.getTestRepositoryConnection().size(owlapiTurtleContext));
         
         this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/primer.original.turtle.ttl"), "",
                 RDFFormat.TURTLE, originalTurtleContext);
+        this.getTestRepositoryConnection().commit();
         Assert.assertEquals(268, this.getTestRepositoryConnection().size(originalTurtleContext));
         
         this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/primer.fromrdfxml.turtle.ttl"),
                 "", RDFFormat.TURTLE, fromrdfxmlTurtleContext);
+        this.getTestRepositoryConnection().commit();
         Assert.assertEquals(295, this.getTestRepositoryConnection().size(fromrdfxmlTurtleContext));
         
         final StatementCollector newStatementCollector = new StatementCollector();
@@ -101,7 +104,6 @@ public class OWLPrimerParsingTest extends AbstractSesameTest
         final Set<Statement> testSetFromrdfxmlTurtleContext =
                 new TreeSet<Statement>(new ContextInsensitiveStatementComparator());
         testSetFromrdfxmlTurtleContext.addAll(fromrdfxmlTurtleContextStatementCollector.getStatements());
-        
         // Assert.assertTrue(ModelUtil.isSubset(testSetOwlapiTurtleContext,
         // testSetFromrdfxmlTurtleContext));
     }
@@ -112,9 +114,8 @@ public class OWLPrimerParsingTest extends AbstractSesameTest
     {
         this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/primer.fromrdfxml.turtle.ttl"),
                 "", RDFFormat.TURTLE);
-        
+        this.getTestRepositoryConnection().commit();
         Assert.assertEquals(295, this.getTestRepositoryConnection().size());
-        
         // this.getTestRepositoryConnection().export(new TurtleWriter(System.out));
     }
     
@@ -124,9 +125,8 @@ public class OWLPrimerParsingTest extends AbstractSesameTest
     {
         this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/primer.original.rdfxml.xml"), "",
                 RDFFormat.RDFXML);
-        
+        this.getTestRepositoryConnection().commit();
         Assert.assertEquals(295, this.getTestRepositoryConnection().size());
-        
         // this.getTestRepositoryConnection().export(new TurtleWriter(System.out));
     }
     
@@ -135,7 +135,7 @@ public class OWLPrimerParsingTest extends AbstractSesameTest
     {
         this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/primer.original.turtle.ttl"), "",
                 RDFFormat.TURTLE);
-        
+        this.getTestRepositoryConnection().commit();
         Assert.assertEquals(268, this.getTestRepositoryConnection().size());
     }
     
@@ -145,7 +145,7 @@ public class OWLPrimerParsingTest extends AbstractSesameTest
     {
         this.getTestRepositoryConnection().add(
                 this.getClass().getResourceAsStream("/primer.owlapitestresource.rdfxml.xml"), "", RDFFormat.RDFXML);
-        
+        this.getTestRepositoryConnection().commit();
         Assert.assertEquals(294, this.getTestRepositoryConnection().size());
         
         // this.getTestRepositoryConnection().export(new TurtleWriter(System.out));
@@ -156,7 +156,7 @@ public class OWLPrimerParsingTest extends AbstractSesameTest
     {
         this.getTestRepositoryConnection().add(
                 this.getClass().getResourceAsStream("/primer.owlapitestresource.turtle.rdf"), "", RDFFormat.TURTLE);
-        
+        this.getTestRepositoryConnection().commit();
         Assert.assertEquals(280, this.getTestRepositoryConnection().size());
     }
 }
