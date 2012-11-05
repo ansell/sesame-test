@@ -50,17 +50,18 @@ public class TurtleBaseParsingTest extends AbstractSesameTest
     @Test
     public final void testTurtleBlankNodeParsing() throws RDFParseException, RepositoryException, IOException
     {
-        this.getTestRepositoryConnection().add(new StringReader("@base <http://test.org/path#> .\n <a1> <b1> <c1> ."), "",
-                RDFFormat.TURTLE);
+        this.getTestRepositoryConnection().add(new StringReader("@base <http://test.org/path#> .\n <a1> <b1> <c1> ."),
+                "", RDFFormat.TURTLE);
         this.getTestRepositoryConnection().commit();
         
         Assert.assertEquals(1, this.getTestRepositoryConnection().size());
         
-        List<Statement> asList = this.getTestRepositoryConnection().getStatements(null, null, null, false).asList();
+        final List<Statement> asList =
+                this.getTestRepositoryConnection().getStatements(null, null, null, false).asList();
         
         Assert.assertEquals(1, asList.size());
         
-        Statement st = asList.get(0);
+        final Statement st = asList.get(0);
         
         Assert.assertEquals(this.getTestValueFactory().createURI("http://test.org/a1"), st.getSubject());
         Assert.assertEquals(this.getTestValueFactory().createURI("http://test.org/b1"), st.getPredicate());
@@ -71,23 +72,23 @@ public class TurtleBaseParsingTest extends AbstractSesameTest
     @Test
     public final void testTurtleBlankNodeParsingAlternate() throws RDFParseException, RepositoryException, IOException
     {
-        this.getTestRepositoryConnection().add(new StringReader("@base <http://test.org/path> .\n <#a1> <#b1> <#c1> ."), "",
-                RDFFormat.TURTLE);
+        this.getTestRepositoryConnection().add(
+                new StringReader("@base <http://test.org/path> .\n <#a1> <#b1> <#c1> ."), "", RDFFormat.TURTLE);
         this.getTestRepositoryConnection().commit();
         
         Assert.assertEquals(1, this.getTestRepositoryConnection().size());
         
-        List<Statement> asList = this.getTestRepositoryConnection().getStatements(null, null, null, false).asList();
+        final List<Statement> asList =
+                this.getTestRepositoryConnection().getStatements(null, null, null, false).asList();
         
         Assert.assertEquals(1, asList.size());
         
-        Statement st = asList.get(0);
+        final Statement st = asList.get(0);
         
         Assert.assertEquals(this.getTestValueFactory().createURI("http://test.org/path#a1"), st.getSubject());
         Assert.assertEquals(this.getTestValueFactory().createURI("http://test.org/path#b1"), st.getPredicate());
         Assert.assertEquals(this.getTestValueFactory().createURI("http://test.org/path#c1"), st.getObject());
         
     }
-
     
 }

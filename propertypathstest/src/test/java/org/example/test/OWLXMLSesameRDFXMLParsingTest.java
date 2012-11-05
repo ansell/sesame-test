@@ -4,15 +4,12 @@
 package org.example.test;
 
 import java.io.IOException;
-import java.io.StringReader;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.openrdf.model.Statement;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
@@ -51,7 +48,7 @@ public class OWLXMLSesameRDFXMLParsingTest extends AbstractSesameTest
     @Test
     public final void testOWLXMLParsingUsingRDFXMLParser() throws RDFParseException, RepositoryException, IOException
     {
-        AtomicInteger failures = new AtomicInteger(0);
+        final AtomicInteger failures = new AtomicInteger(0);
         for(int i = 0; i < 100000; i++)
         {
             try
@@ -60,16 +57,17 @@ public class OWLXMLSesameRDFXMLParsingTest extends AbstractSesameTest
                         RDFFormat.RDFXML);
                 this.getTestRepositoryConnection().commit();
                 
-                // If the parse succeeds for any reason verify that there are not any generated triples in the repository
+                // If the parse succeeds for any reason verify that there are not any generated
+                // triples in the repository
                 Assert.assertEquals(0, this.getTestRepositoryConnection().size());
                 
                 this.getTestRepositoryConnection().clear();
             }
-            catch(RDFParseException rdfpe)
+            catch(final RDFParseException rdfpe)
             {
                 failures.incrementAndGet();
             }
-        }        
+        }
         
         Assert.assertEquals(100000, failures.get());
     }

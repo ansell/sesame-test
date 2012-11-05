@@ -3,9 +3,7 @@
  */
 package org.example.test;
 
-
 import java.io.PrintWriter;
-import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -14,25 +12,18 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.mindswap.pellet.exceptions.InconsistentOntologyException;
-import org.openrdf.model.Literal;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.query.Binding;
 import org.openrdf.query.BindingSet;
-import org.openrdf.query.GraphQuery;
-import org.openrdf.query.GraphQueryResult;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.TupleQuery;
 import org.openrdf.query.TupleQueryResult;
-import org.openrdf.query.algebra.evaluation.function.string.Contains;
 import org.openrdf.query.impl.DatasetImpl;
 import org.openrdf.repository.util.RDFInserter;
-import org.semanticweb.owlapi.formats.RDFXMLOntologyFormatFactory;
 import org.semanticweb.owlapi.formats.TurtleOntologyFormatFactory;
 import org.semanticweb.owlapi.io.StreamDocumentSource;
 import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
@@ -79,7 +70,8 @@ public class PoddArtifactHasTopObjectTest extends AbstractSesameTest
         
         this.parsedOntology =
                 this.manager.loadOntologyFromOntologyDocument(new StreamDocumentSource(this.getClass()
-                        .getResourceAsStream("/error-podd-artifact-has-top-object.ttl"), new TurtleOntologyFormatFactory()));
+                        .getResourceAsStream("/error-podd-artifact-has-top-object.ttl"),
+                        new TurtleOntologyFormatFactory()));
         
         Assert.assertFalse(this.parsedOntology.isEmpty());
         
@@ -111,7 +103,8 @@ public class PoddArtifactHasTopObjectTest extends AbstractSesameTest
             this.reasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
             
             final InferredOntologyGenerator iog = new InferredOntologyGenerator(this.reasoner);
-            final OWLOntology inferredAxiomsOntology = this.manager.createOntology(IRI.create(this.testInferredContextUri));
+            final OWLOntology inferredAxiomsOntology =
+                    this.manager.createOntology(IRI.create(this.testInferredContextUri));
             iog.fillOntology(this.manager, inferredAxiomsOntology);
             
             final RDFInserter inferredRepositoryHandler = new RDFInserter(this.getTestRepositoryConnection());
@@ -135,7 +128,7 @@ public class PoddArtifactHasTopObjectTest extends AbstractSesameTest
             }
             Assert.fail("Expected an exception for an inconsistent ontology");
         }
-        catch(Exception ioe)
+        catch(final Exception ioe)
         {
             Assert.assertTrue(ioe.getMessage().contains("Reason for inconsistency"));
         }

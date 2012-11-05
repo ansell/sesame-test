@@ -146,7 +146,8 @@ public class SesamePropertyPathBindingBugTest extends AbstractSesameTest
             }
         }
         
-        // Uncomment the following code lines to dump the fully inferred ontology file at this point.
+        // Uncomment the following code lines to dump the fully inferred ontology file at this
+        // point.
         // Dump to a concrete set of triples to narrow down the cause
         // RDFWriter writer = Rio.createWriter(RDFFormat.NTRIPLES, new
         // FileOutputStream("/home/peter/temp/inferredplantontology-v16.nt"));

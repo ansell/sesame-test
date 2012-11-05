@@ -175,34 +175,6 @@ public class PlantOntologyReasonedPathTest extends AbstractSesameTest
     }
     
     @Test
-    public final void testClassHierarchyRenderingToHTML() throws Exception
-    {
-        final Set<OWLClass> flattened = this.reasoner.getSubClasses(OWL.Thing, true).getFlattened();
-        
-        StringBuilder sb = new StringBuilder(1024);
-        
-        sb.append("<div>");
-        sb.append(OWL.Thing.getIRI().toString());
-        sb.append("</div>\n");
-        
-        sb.append("<ol>\n");
-        for(final OWLClass nextClass : flattened)
-        {
-            sb.append("<li>");
-            
-            System.out.println(nextClass);
-            sb.append(nextClass.getIRI().toString());
-            
-            sb.append("</li>\n");
-        }
-        sb.append("</ol>\n");
-        
-        Assert.assertEquals(132, flattened.size());
-        
-        System.out.println(sb.toString());
-    }
-    
-    @Test
     public final void testClassHierarchyRenderingSubDirectTopLevelReasonerTopClassNode() throws Exception
     {
         final Set<OWLClass> flattened =
@@ -282,6 +254,34 @@ public class PlantOntologyReasonedPathTest extends AbstractSesameTest
         }
         
         Assert.assertEquals(4, flattened.size());
+    }
+    
+    @Test
+    public final void testClassHierarchyRenderingToHTML() throws Exception
+    {
+        final Set<OWLClass> flattened = this.reasoner.getSubClasses(OWL.Thing, true).getFlattened();
+        
+        final StringBuilder sb = new StringBuilder(1024);
+        
+        sb.append("<div>");
+        sb.append(OWL.Thing.getIRI().toString());
+        sb.append("</div>\n");
+        
+        sb.append("<ol>\n");
+        for(final OWLClass nextClass : flattened)
+        {
+            sb.append("<li>");
+            
+            System.out.println(nextClass);
+            sb.append(nextClass.getIRI().toString());
+            
+            sb.append("</li>\n");
+        }
+        sb.append("</ol>\n");
+        
+        Assert.assertEquals(132, flattened.size());
+        
+        System.out.println(sb.toString());
     }
     
     @Test
