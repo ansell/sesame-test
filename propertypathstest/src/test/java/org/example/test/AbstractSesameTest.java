@@ -2,11 +2,16 @@ package org.example.test;
 
 import org.junit.After;
 import org.junit.Before;
+import org.openrdf.model.Resource;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.sail.SailRepository;
+import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.RDFHandlerException;
+import org.openrdf.rio.Rio;
+import org.openrdf.rio.UnsupportedRDFormatException;
 import org.openrdf.sail.memory.MemoryStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +29,12 @@ public class AbstractSesameTest
     private ValueFactory testValueFactory;
     
     private RepositoryConnection testRepositoryConnection;
+    
+    protected void dumpContexts(final RDFFormat format, final Resource... contexts) throws RepositoryException,
+        RDFHandlerException, UnsupportedRDFormatException
+    {
+        this.getTestRepositoryConnection().export(Rio.createWriter(format, System.out), contexts);
+    }
     
     /**
      * @return the testRepository

@@ -89,19 +89,19 @@
 				<!-- <dependency> <groupId>net.fortytwo.sesametools</groupId> <artifactId>common</artifactId> 
 						<version>1.7-SNAPSHOT</version> </dependency> -->
 				<dependency>
-						<groupId>com.github.ansell.owlapi</groupId>
+						<groupId>net.sourceforge.owlapi</groupId>
 						<artifactId>owlapi-api</artifactId>
-						<version>3.5-SNAPSHOT</version>
+						<version>3.5-ansell-SNAPSHOT</version>
 				</dependency>
 				<dependency>
-						<groupId>com.github.ansell.owlapi</groupId>
+						<groupId>net.sourceforge.owlapi</groupId>
 						<artifactId>owlapi-impl</artifactId>
-						<version>3.5-SNAPSHOT</version>
+						<version>3.5-ansell-SNAPSHOT</version>
 				</dependency>
 				<dependency>
-						<groupId>com.github.ansell.owlapi</groupId>
+						<groupId>net.sourceforge.owlapi</groupId>
 						<artifactId>owlapi-rio</artifactId>
-						<version>3.5-SNAPSHOT</version>
+						<version>3.5-ansell-SNAPSHOT</version>
 				</dependency>
 				<dependency>
 						<groupId>com.github.ansell.pellet</groupId>
