@@ -47,26 +47,14 @@ public class SesameListParsingTest extends AbstractSesameTest
     }
     
     @Test
-    public final void testTurtleListParsing() throws RDFParseException, RepositoryException, IOException,
-        RDFHandlerException, UnsupportedRDFormatException
-    {
-        this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/rioParserTest1.ttl"), "",
-                RDFFormat.TURTLE);
-        this.getTestRepositoryConnection().commit();
-        dumpContexts(RDFFormat.TURTLE);
-        dumpContexts(RDFFormat.RDFXML);
-        Assert.assertEquals(20, this.getTestRepositoryConnection().size());
-    }
-    
-    @Test
     public final void testRDFXMLListParsing() throws RDFParseException, RepositoryException, IOException,
         RDFHandlerException, UnsupportedRDFormatException
     {
         this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/rioParserTest1.rdf"), "",
                 RDFFormat.RDFXML);
         this.getTestRepositoryConnection().commit();
-        dumpContexts(RDFFormat.TURTLE);
-        dumpContexts(RDFFormat.RDFXML);
+        this.dumpContexts(RDFFormat.TURTLE);
+        this.dumpContexts(RDFFormat.RDFXML);
         Assert.assertEquals(20, this.getTestRepositoryConnection().size());
     }
     
@@ -77,9 +65,21 @@ public class SesameListParsingTest extends AbstractSesameTest
         this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/rioParserTest1-short.rdf"), "",
                 RDFFormat.RDFXML);
         this.getTestRepositoryConnection().commit();
-        dumpContexts(RDFFormat.TURTLE);
-        dumpContexts(RDFFormat.RDFXML);
+        this.dumpContexts(RDFFormat.TURTLE);
+        this.dumpContexts(RDFFormat.RDFXML);
         Assert.assertEquals(9, this.getTestRepositoryConnection().size());
+    }
+    
+    @Test
+    public final void testTurtleListParsing() throws RDFParseException, RepositoryException, IOException,
+        RDFHandlerException, UnsupportedRDFormatException
+    {
+        this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/rioParserTest1.ttl"), "",
+                RDFFormat.TURTLE);
+        this.getTestRepositoryConnection().commit();
+        this.dumpContexts(RDFFormat.TURTLE);
+        this.dumpContexts(RDFFormat.RDFXML);
+        Assert.assertEquals(20, this.getTestRepositoryConnection().size());
     }
     
     @Test
@@ -89,8 +89,8 @@ public class SesameListParsingTest extends AbstractSesameTest
         this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/rioParserTest1-short.ttl"), "",
                 RDFFormat.TURTLE);
         this.getTestRepositoryConnection().commit();
-        dumpContexts(RDFFormat.TURTLE);
-        dumpContexts(RDFFormat.RDFXML);
+        this.dumpContexts(RDFFormat.TURTLE);
+        this.dumpContexts(RDFFormat.RDFXML);
         Assert.assertEquals(9, this.getTestRepositoryConnection().size());
     }
     

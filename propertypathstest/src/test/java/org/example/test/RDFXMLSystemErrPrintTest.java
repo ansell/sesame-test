@@ -27,22 +27,22 @@ public class RDFXMLSystemErrPrintTest extends AbstractSesameTest
     @Test
     public void testRDFXMLSystemErrPrint() throws Exception
     {
-        PrintStream priorErr = System.err;
+        final PrintStream priorErr = System.err;
         try
         {
             // Override System.err with our own printstream
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             System.setErr(new PrintStream(outputStream, true, "UTF-8"));
             
-            RDFParser rdfParser = Rio.createParser(RDFFormat.RDFXML);
-            RDFHandler handler = new StatementCollector();
+            final RDFParser rdfParser = Rio.createParser(RDFFormat.RDFXML);
+            final RDFHandler handler = new StatementCollector();
             rdfParser.setRDFHandler(handler);
             
             rdfParser.parse(this.getClass().getResourceAsStream("/testBlankNodes.ttl"), "");
             
             Assert.assertEquals("System.err was printed to during the parse process", 0, outputStream.size());
         }
-        catch(RDFParseException rdfpe)
+        catch(final RDFParseException rdfpe)
         {
             Assert.assertEquals("Content is not allowed in prolog. [line 1, column 1]", rdfpe.getMessage());
         }
