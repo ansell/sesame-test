@@ -461,6 +461,8 @@ public class SesamePropertyPathBindingBugTest extends AbstractSesameTest
                 "", RDFFormat.NTRIPLES, this.testContextUri);
         this.getTestRepositoryConnection().commit();
         
+        Assert.assertEquals(44472, this.getTestRepositoryConnection().size());
+        
         final TupleQuery query =
                 this.getTestRepositoryConnection()
                         .prepareTupleQuery(
