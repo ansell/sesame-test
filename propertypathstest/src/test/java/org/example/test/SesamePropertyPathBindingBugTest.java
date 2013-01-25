@@ -383,6 +383,294 @@ public class SesamePropertyPathBindingBugTest extends AbstractSesameTest
      * @throws Exception
      */
     @Test
+    public final void testFromMinimalConcreteTripleTestFileWithOptional() throws Exception
+    {
+        this.getTestRepositoryConnection().add(
+                this.getClass().getResourceAsStream("/minimalinferredplantontology-v16.nt"), "", RDFFormat.NTRIPLES,
+                this.testContextUri);
+        this.getTestRepositoryConnection().commit();
+        
+        final TupleQuery query =
+                this.getTestRepositoryConnection()
+                        .prepareTupleQuery(
+                                QueryLanguage.SPARQL,
+                                "SELECT DISTINCT ?parent (COUNT(DISTINCT ?child) AS ?childCount) WHERE { ?child a <http://www.w3.org/2002/07/owl#Class> . ?child <http://www.w3.org/2000/01/rdf-schema#subClassOf>+ ?parent . FILTER(isIRI(?child) && isIRI(?parent)) OPTIONAL{ ?parent <http://www.w3.org/2000/01/rdf-schema#label> ?label . } } GROUP BY ?parent");
+        
+        final DatasetImpl testDataset = new DatasetImpl();
+        testDataset.addDefaultGraph(this.testContextUri);
+        // switch to a single context to see if that makes a difference
+        // testDataset.addDefaultGraph(this.testInferredContextUri);
+        
+        query.setDataset(testDataset);
+        
+        query.setBinding("parent", this.getTestValueFactory().createURI("http://www.w3.org/2002/07/owl#Thing"));
+        
+        final TupleQueryResult queryResult = query.evaluate();
+        
+        try
+        {
+            Assert.assertTrue(queryResult.hasNext());
+            
+            final AtomicInteger count = new AtomicInteger(0);
+            final AtomicInteger missingParentCount = new AtomicInteger(0);
+            
+            while(queryResult.hasNext())
+            {
+                final BindingSet bindingSet = queryResult.next();
+                
+                this.log.info("nextBinding: {}", bindingSet);
+                
+                if(!bindingSet.hasBinding("parent"))
+                {
+                    missingParentCount.incrementAndGet();
+                }
+                
+                Assert.assertTrue(bindingSet.hasBinding("childCount"));
+                
+                final Literal value = (Literal)bindingSet.getBinding("childCount").getValue();
+                
+                Assert.assertEquals(157, value.intValue());
+                
+                Assert.assertFalse("Should only have been one result binding", queryResult.hasNext());
+                count.incrementAndGet();
+            }
+            
+            Assert.assertEquals("Parent should have been bound to each binding", 0, missingParentCount.get());
+            
+            Assert.assertEquals("There should have only been one result from the query", 1, count.get());
+        }
+        finally
+        {
+            queryResult.close();
+        }
+    }
+    
+    /**
+     * This test still failing
+     * 
+     * @throws Exception
+     */
+    @Test
+    public final void testFromInferredConcreteTripleTestFileWithOptionalNonOWLThingRecursive() throws Exception
+    {
+        this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/inferredplantontology-v16.nt"),
+                "", RDFFormat.NTRIPLES, this.testContextUri);
+        this.getTestRepositoryConnection().commit();
+        
+        final TupleQuery query =
+                this.getTestRepositoryConnection()
+                        .prepareTupleQuery(
+                                QueryLanguage.SPARQL,
+                                "SELECT DISTINCT ?parent ?child WHERE { ?child a <http://www.w3.org/2002/07/owl#Class> . ?child <http://www.w3.org/2000/01/rdf-schema#subClassOf>+ ?parent . FILTER(isIRI(?child) && isIRI(?parent)) OPTIONAL{ ?parent <http://www.w3.org/2000/01/rdf-schema#label> ?label . } } ORDER BY ?child");
+        
+        final DatasetImpl testDataset = new DatasetImpl();
+        testDataset.addDefaultGraph(this.testContextUri);
+        // switch to a single context to see if that makes a difference
+        // testDataset.addDefaultGraph(this.testInferredContextUri);
+        
+        query.setDataset(testDataset);
+        
+        query.setBinding("parent", this.getTestValueFactory().createURI("http://purl.obolibrary.org/obo/PO_0000034"));
+        
+        final TupleQueryResult queryResult = query.evaluate();
+        
+        try
+        {
+            Assert.assertTrue(queryResult.hasNext());
+            
+            final AtomicInteger count = new AtomicInteger(0);
+            final AtomicInteger missingParentCount = new AtomicInteger(0);
+            
+            while(queryResult.hasNext())
+            {
+                final BindingSet bindingSet = queryResult.next();
+                
+                this.log.info("nextBinding: {}", bindingSet);
+                
+                count.incrementAndGet();
+            }
+            
+            Assert.assertEquals("Parent should have been bound to each binding", 0, missingParentCount.get());
+            
+            Assert.assertEquals("There should have only been 23 results from the query", 23, count.get());
+        }
+        finally
+        {
+            queryResult.close();
+        }
+    }
+    
+    /**
+     * This test still failing
+     * 
+     * @throws Exception
+     */
+    @Test
+    public final void testFromInferredConcreteTripleTestFileWithOptionalNonOWLThingNonRecursive() throws Exception
+    {
+        this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/inferredplantontology-v16.nt"),
+                "", RDFFormat.NTRIPLES, this.testContextUri);
+        this.getTestRepositoryConnection().commit();
+        
+        final TupleQuery query =
+                this.getTestRepositoryConnection()
+                        .prepareTupleQuery(
+                                QueryLanguage.SPARQL,
+                                "SELECT DISTINCT ?parent ?child WHERE { ?child a <http://www.w3.org/2002/07/owl#Class> . ?child <http://www.w3.org/2000/01/rdf-schema#subClassOf> ?parent . FILTER(isIRI(?child) && isIRI(?parent)) OPTIONAL{ ?parent <http://www.w3.org/2000/01/rdf-schema#label> ?label . } } ORDER BY ?child");
+        
+        final DatasetImpl testDataset = new DatasetImpl();
+        testDataset.addDefaultGraph(this.testContextUri);
+        // switch to a single context to see if that makes a difference
+        // testDataset.addDefaultGraph(this.testInferredContextUri);
+        
+        query.setDataset(testDataset);
+        
+        query.setBinding("parent", this.getTestValueFactory().createURI("http://purl.obolibrary.org/obo/PO_0000034"));
+        
+        final TupleQueryResult queryResult = query.evaluate();
+        
+        try
+        {
+            Assert.assertTrue(queryResult.hasNext());
+            
+            final AtomicInteger count = new AtomicInteger(0);
+            final AtomicInteger missingParentCount = new AtomicInteger(0);
+            
+            while(queryResult.hasNext())
+            {
+                final BindingSet bindingSet = queryResult.next();
+                
+                this.log.info("nextBinding: {}", bindingSet);
+                
+                count.incrementAndGet();
+            }
+            
+            Assert.assertEquals("Parent should have been bound to each binding", 0, missingParentCount.get());
+            
+            Assert.assertEquals("There should have only been 14 results from the query", 14, count.get());
+        }
+        finally
+        {
+            queryResult.close();
+        }
+    }
+    
+    /**
+     * This test still failing
+     * 
+     * @throws Exception
+     */
+    @Test
+    public final void testFromInferredConcreteTripleTestFileWithOptionalNonOWLThingRecursiveCase2() throws Exception
+    {
+        this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/inferredplantontology-v16.nt"),
+                "", RDFFormat.NTRIPLES, this.testContextUri);
+        this.getTestRepositoryConnection().commit();
+        
+        final TupleQuery query =
+                this.getTestRepositoryConnection()
+                        .prepareTupleQuery(
+                                QueryLanguage.SPARQL,
+                                "SELECT DISTINCT ?parent ?child WHERE { ?child a <http://www.w3.org/2002/07/owl#Class> . ?child <http://www.w3.org/2000/01/rdf-schema#subClassOf>+ ?parent . FILTER(isIRI(?child) && isIRI(?parent)) OPTIONAL{ ?parent <http://www.w3.org/2000/01/rdf-schema#label> ?label . } } ORDER BY ?child");
+        
+        final DatasetImpl testDataset = new DatasetImpl();
+        testDataset.addDefaultGraph(this.testContextUri);
+        // switch to a single context to see if that makes a difference
+        // testDataset.addDefaultGraph(this.testInferredContextUri);
+        
+        query.setDataset(testDataset);
+        
+        query.setBinding("parent", this.getTestValueFactory().createURI("http://purl.obolibrary.org/obo/PO_0025131"));
+        
+        final TupleQueryResult queryResult = query.evaluate();
+        
+        try
+        {
+            Assert.assertTrue(queryResult.hasNext());
+            
+            final AtomicInteger count = new AtomicInteger(0);
+            final AtomicInteger missingParentCount = new AtomicInteger(0);
+            
+            while(queryResult.hasNext())
+            {
+                final BindingSet bindingSet = queryResult.next();
+                
+                this.log.info("nextBinding: {}", bindingSet);
+                
+                count.incrementAndGet();
+            }
+            
+            Assert.assertEquals("Parent should have been bound to each binding", 0, missingParentCount.get());
+            
+            Assert.assertEquals("There should have only been 1078 results from the query", 1078, count.get());
+        }
+        finally
+        {
+            queryResult.close();
+        }
+    }
+    
+    /**
+     * This test still failing
+     * 
+     * @throws Exception
+     */
+    @Test
+    public final void testFromInferredConcreteTripleTestFileWithOptionalNonOWLThingNonRecursiveCase2() throws Exception
+    {
+        this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/inferredplantontology-v16.nt"),
+                "", RDFFormat.NTRIPLES, this.testContextUri);
+        this.getTestRepositoryConnection().commit();
+        
+        final TupleQuery query =
+                this.getTestRepositoryConnection()
+                        .prepareTupleQuery(
+                                QueryLanguage.SPARQL,
+                                "SELECT DISTINCT ?parent ?child WHERE { ?child a <http://www.w3.org/2002/07/owl#Class> . ?child <http://www.w3.org/2000/01/rdf-schema#subClassOf> ?parent . FILTER(isIRI(?child) && isIRI(?parent)) OPTIONAL{ ?parent <http://www.w3.org/2000/01/rdf-schema#label> ?label . } } ORDER BY ?child");
+        
+        final DatasetImpl testDataset = new DatasetImpl();
+        testDataset.addDefaultGraph(this.testContextUri);
+        // switch to a single context to see if that makes a difference
+        // testDataset.addDefaultGraph(this.testInferredContextUri);
+        
+        query.setDataset(testDataset);
+        
+        query.setBinding("parent", this.getTestValueFactory().createURI("http://purl.obolibrary.org/obo/PO_0025131"));
+        
+        final TupleQueryResult queryResult = query.evaluate();
+        
+        try
+        {
+            Assert.assertTrue(queryResult.hasNext());
+            
+            final AtomicInteger count = new AtomicInteger(0);
+            final AtomicInteger missingParentCount = new AtomicInteger(0);
+            
+            while(queryResult.hasNext())
+            {
+                final BindingSet bindingSet = queryResult.next();
+                
+                this.log.info("nextBinding: {}", bindingSet);
+                
+                count.incrementAndGet();
+            }
+            
+            Assert.assertEquals("Parent should have been bound to each binding", 0, missingParentCount.get());
+            
+            Assert.assertEquals("There should have only been 3 results from the query", 3, count.get());
+        }
+        finally
+        {
+            queryResult.close();
+        }
+    }
+    
+    /**
+     * This test still failing
+     * 
+     * @throws Exception
+     */
+    @Test
     public final void testFromMinimalConcreteTripleTestFileWithoutCountAndGroupBy() throws Exception
     {
         this.getTestRepositoryConnection().add(
