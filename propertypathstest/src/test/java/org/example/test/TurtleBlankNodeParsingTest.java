@@ -154,4 +154,21 @@ public class TurtleBlankNodeParsingTest extends AbstractSesameTest
         
     }
     
+    /**
+     * Test for SES-1647
+     * 
+     * @throws RDFParseException
+     * @throws RepositoryException
+     * @throws IOException
+     */
+    @Test
+    public final void testTurtleBlankNodeParsingInseeGeo() throws RDFParseException, RepositoryException, IOException
+    {
+        this.getTestRepositoryConnection().add(this.getClass().getResourceAsStream("/insee-geo-onto.ttl"), "",
+                RDFFormat.TURTLE);
+        this.getTestRepositoryConnection().commit();
+        Assert.assertEquals(781, this.getTestRepositoryConnection().size());
+        
+    }
+    
 }
