@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.example.sesame.RdfConverter;
@@ -12,6 +13,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.OpenRDFException;
+import org.openrdf.model.Namespace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +32,7 @@ public class RdfConverterTest
     private String testInputMimeType;
     private String testBaseURI;
     private String testOutputMimeType;
+    private List<Namespace> testNamespaces;
     
     @Before
     public void setUp() throws Exception
@@ -50,11 +53,12 @@ public class RdfConverterTest
         this.testBaseURI = "http://purl.org/NET/dc_owl2dl/dcam";
         this.testOutputMimeType = "application/rdf+xml";
         this.testInputStream = this.getClass().getResourceAsStream(this.testFileName);
+        this.testNamespaces = new ArrayList<Namespace>();
         
         Assert.assertNotNull(this.testInputStream);
         
         RdfConverter.convert(this.testWriter, this.testInputStream, this.testFileName, this.testInputMimeType,
-                this.testBaseURI, this.testOutputMimeType);
+                this.testBaseURI, this.testOutputMimeType, this.testNamespaces);
         
         RdfConverterTest.LOGGER.info("output=");
         RdfConverterTest.LOGGER.info(this.testWriter.toString());
@@ -69,11 +73,12 @@ public class RdfConverterTest
         this.testBaseURI = "http://purl.org/NET/dc_owl2dl/dcmitype";
         this.testOutputMimeType = "application/rdf+xml";
         this.testInputStream = this.getClass().getResourceAsStream(this.testFileName);
+        this.testNamespaces = new ArrayList<Namespace>();
         
         Assert.assertNotNull(this.testInputStream);
         
         RdfConverter.convert(this.testWriter, this.testInputStream, this.testFileName, this.testInputMimeType,
-                this.testBaseURI, this.testOutputMimeType);
+                this.testBaseURI, this.testOutputMimeType, this.testNamespaces);
         
         RdfConverterTest.LOGGER.info("output=");
         RdfConverterTest.LOGGER.info(this.testWriter.toString());
@@ -88,11 +93,12 @@ public class RdfConverterTest
         this.testBaseURI = "http://purl.org/NET/dc_owl2dl/terms_od";
         this.testOutputMimeType = "application/rdf+xml";
         this.testInputStream = this.getClass().getResourceAsStream(this.testFileName);
+        this.testNamespaces = new ArrayList<Namespace>();
         
         Assert.assertNotNull(this.testInputStream);
         
         RdfConverter.convert(this.testWriter, this.testInputStream, this.testFileName, this.testInputMimeType,
-                this.testBaseURI, this.testOutputMimeType);
+                this.testBaseURI, this.testOutputMimeType, this.testNamespaces);
         
         RdfConverterTest.LOGGER.info("output=");
         RdfConverterTest.LOGGER.info(this.testWriter.toString());
