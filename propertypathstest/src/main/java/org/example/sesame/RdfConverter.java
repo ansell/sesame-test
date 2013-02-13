@@ -61,7 +61,7 @@ public class RdfConverter
         
         namespaces.add(new NamespaceImpl("rdf", RDF.NAMESPACE));
         namespaces.add(new NamespaceImpl("rdfs", RDFS.NAMESPACE));
-        namespaces.add(new NamespaceImpl("dc", "http://purl.org/dc/terms/"));
+        namespaces.add(new NamespaceImpl("dcterms", "http://purl.org/dc/terms/"));
         namespaces.add(new NamespaceImpl("xsd", "http://www.w3.org/2001/XMLSchema#"));
         
         namespaces.add(new NamespaceImpl("queryall_profile", "http://purl.org/queryall/profile:"));
@@ -71,6 +71,9 @@ public class RdfConverter
         namespaces.add(new NamespaceImpl("bio2rdf_query", "http://bio2rdf.org/query:"));
         namespaces.add(new NamespaceImpl("bio2rdf_rdfrule", "http://bio2rdf.org/rdfrule:"));
         namespaces.add(new NamespaceImpl("bio2rdf_ns", "http://bio2rdf.org/ns:"));
+        
+        namespaces.add(new NamespaceImpl("queryall", "http://purl.org/queryall/"));
+        namespaces.add(new NamespaceImpl("bio2rdf", "http://bio2rdf.org/"));
         
         RdfConverter.convert(writer, resource, "bio2rdf-providers-release2-sparql.n3",
                 RDFFormat.N3.getDefaultMIMEType(), "", RDFFormat.TURTLE.getDefaultMIMEType(), namespaces);
