@@ -3,6 +3,8 @@
  */
 package org.example.test;
 
+import info.aduna.iteration.Iterations;
+
 import java.io.PrintWriter;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -120,8 +122,8 @@ public class PoddArtifactHasTopObjectTest extends AbstractSesameTest
             
             if(this.log.isTraceEnabled())
             {
-                for(final Statement nextStatement : this.getTestRepositoryConnection()
-                        .getStatements(null, null, null, true, this.testInferredContextUri).asList())
+                for(final Statement nextStatement : Iterations.asList(this.getTestRepositoryConnection().getStatements(
+                        null, null, null, true, this.testInferredContextUri)))
                 {
                     this.log.trace(nextStatement.toString());
                 }

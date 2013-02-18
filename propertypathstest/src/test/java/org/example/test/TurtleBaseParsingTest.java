@@ -3,6 +3,8 @@
  */
 package org.example.test;
 
+import info.aduna.iteration.Iterations;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.List;
@@ -57,7 +59,7 @@ public class TurtleBaseParsingTest extends AbstractSesameTest
         Assert.assertEquals(1, this.getTestRepositoryConnection().size());
         
         final List<Statement> asList =
-                this.getTestRepositoryConnection().getStatements(null, null, null, false).asList();
+                Iterations.asList(this.getTestRepositoryConnection().getStatements(null, null, null, false));
         
         Assert.assertEquals(1, asList.size());
         
@@ -79,7 +81,7 @@ public class TurtleBaseParsingTest extends AbstractSesameTest
         Assert.assertEquals(1, this.getTestRepositoryConnection().size());
         
         final List<Statement> asList =
-                this.getTestRepositoryConnection().getStatements(null, null, null, false).asList();
+                Iterations.asList(this.getTestRepositoryConnection().getStatements(null, null, null, false));
         
         Assert.assertEquals(1, asList.size());
         
