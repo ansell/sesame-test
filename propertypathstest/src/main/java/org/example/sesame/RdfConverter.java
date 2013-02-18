@@ -10,7 +10,6 @@ import java.util.List;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Namespace;
 import org.openrdf.model.impl.NamespaceImpl;
-import org.openrdf.model.vocabulary.DC;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.rio.RDFFormat;
