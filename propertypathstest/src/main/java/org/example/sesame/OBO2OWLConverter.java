@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.openrdf.OpenRDFException;
@@ -19,9 +20,19 @@ import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParser;
 import org.openrdf.rio.RDFWriter;
 import org.openrdf.rio.Rio;
+import org.semanticweb.owlapi.change.OWLOntologyChangeData;
 import org.semanticweb.owlapi.formats.OBOOntologyFormatFactory;
 import org.semanticweb.owlapi.io.StreamDocumentSource;
+import org.semanticweb.owlapi.model.AddOntologyAnnotation;
+import org.semanticweb.owlapi.model.AnnotationChange;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAnnotationProperty;
+import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLDeclarationAxiom;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyChangeVisitor;
+import org.semanticweb.owlapi.model.OWLOntologyChangeVisitorEx;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
@@ -39,12 +50,34 @@ public class OBO2OWLConverter
             final String inputMimeType, final String baseURI, final String outputMimeType, List<Namespace> namespaces)
         throws OpenRDFException, IOException, OWLOntologyCreationException
     {
-        OWLOntologyManager ontologyManager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
-        
+        OWLOntologyManager manager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
+        OWLDataFactory df = manager.getOWLDataFactory();
         OWLOntology ontology =
-                ontologyManager.loadOntologyFromOntologyDocument(new StreamDocumentSource(inputStream,
+                manager.loadOntologyFromOntologyDocument(new StreamDocumentSource(inputStream,
                         new OBOOntologyFormatFactory()));
         
+        List<String> missingAnnotationProperties =
+                Arrays.asList("http://purl.obolibrary.org/obo/def",
+                        "http://www.geneontology.org/formats/oboInOWL#xref",
+                        "http://www.geneontology.org/formats/oboInOWL#hasRelatedSynonym");
+        for(String nextMissingProperty : missingAnnotationProperties)
+        {
+            OWLAnnotationProperty owlProperty = df.getOWLAnnotationProperty(IRI.create(nextMissingProperty));
+            OWLDeclarationAxiom declarationAxiom = df.getOWLDeclarationAxiom(owlProperty);
+            manager.addAxiom(ontology, declarationAxiom);
+        }
+        
+        List<String> missingObjectProperties = Arrays.asList("http://purl.obolibrary.org/obo/part_of");
+        for(String nextMissingProperty : missingObjectProperties)
+        {
+            OWLObjectProperty owlProperty = df.getOWLObjectProperty(IRI.create(nextMissingProperty));
+            OWLDeclarationAxiom declarationAxiom = df.getOWLDeclarationAxiom(owlProperty);
+            manager.addAxiom(ontology, declarationAxiom);
+        }
+        
+        // To add a specific annotation property and value use this
+        // AddOntologyAnnotation change = new AddOntologyAnnotation(ontology,
+        // df.getOWLAnnotation(owlAnnotationProperty, value))
         RDFWriter rdfWriter =
                 Rio.createWriter(Rio.getWriterFormatForMIMEType(outputMimeType, RDFFormat.RDFXML), writer);
         
