@@ -42,6 +42,9 @@ import org.semanticweb.owlapi.profiles.OWLProfile;
 import org.semanticweb.owlapi.profiles.OWLProfileRegistry;
 import org.semanticweb.owlapi.profiles.OWLProfileReport;
 import org.semanticweb.owlapi.profiles.OWLProfileViolation;
+import org.semanticweb.owlapi.reasoner.OWLReasoner;
+import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
+import org.semanticweb.owlapi.reasoner.OWLReasonerFactoryRegistry;
 import org.semanticweb.owlapi.rio.RioRenderer;
 
 public class OBO2OWLConverter
@@ -106,6 +109,20 @@ public class OBO2OWLConverter
         
         RioRenderer renderer = new RioRenderer(ontology, ontology.getOWLOntologyManager(), rdfWriter, null);
         renderer.render();
+        
+        OWLReasonerFactory reasonerFactory = OWLReasonerFactoryRegistry.getInstance().getReasonerFactory("Pellet");
+        
+        OWLReasoner reasoner = reasonerFactory.createReasoner(ontology);
+        
+        if(!reasoner.isConsistent())
+        {
+            System.err.println("Reasoner is NOT consistent");
+        }
+        else
+        {
+            System.out.println("Reasoner is consistent");
+        }
+        
     }
     
     /**
