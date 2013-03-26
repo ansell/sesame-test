@@ -84,14 +84,6 @@ public class OBO2OWLConverter
         // To add a specific annotation property and value use this
         // AddOntologyAnnotation change = new AddOntologyAnnotation(ontology,
         // df.getOWLAnnotation(owlAnnotationProperty, value))
-        RDFWriter rdfWriter =
-                Rio.createWriter(Rio.getWriterFormatForMIMEType(outputMimeType, RDFFormat.RDFXML), writer);
-        
-        for(Namespace nextNamespace : namespaces)
-        {
-            rdfWriter.handleNamespace(nextNamespace.getPrefix(), nextNamespace.getName());
-        }
-        
         OWLProfile profile = OWLProfileRegistry.getInstance().getProfile(OWL2Profile.OWL2_DL);
         
         OWLProfileReport profileReport = profile.checkOntology(ontology);
@@ -109,9 +101,6 @@ public class OBO2OWLConverter
                 System.err.println(nextViolation.toString());
             }
         }
-        
-        RioRenderer renderer = new RioRenderer(ontology, ontology.getOWLOntologyManager(), rdfWriter, null);
-        renderer.render();
         
         OWLReasonerFactory reasonerFactory = OWLReasonerFactoryRegistry.getInstance().getReasonerFactory("Pellet");
         
@@ -131,6 +120,22 @@ public class OBO2OWLConverter
         for(OWLClass nextClass : unsatisfiableClasses)
         {
             System.err.println("Next unsatisfiable class: " + nextClass.getIRI().toString());
+        }
+        
+        // add safety to avoid writing the file if it is not a valid OWL-DL file at this point
+        // Remove this safety to generate the file anyway
+        if(unsatisfiableClasses.isEmpty() && reasoner.isConsistent())
+        {
+            RDFWriter rdfWriter =
+                    Rio.createWriter(Rio.getWriterFormatForMIMEType(outputMimeType, RDFFormat.RDFXML), writer);
+            
+            for(Namespace nextNamespace : namespaces)
+            {
+                rdfWriter.handleNamespace(nextNamespace.getPrefix(), nextNamespace.getName());
+            }
+            
+            RioRenderer renderer = new RioRenderer(ontology, ontology.getOWLOntologyManager(), rdfWriter, null);
+            renderer.render();
         }
     }
     
