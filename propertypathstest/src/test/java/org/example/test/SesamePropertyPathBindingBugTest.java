@@ -65,6 +65,8 @@ public class SesamePropertyPathBindingBugTest extends AbstractSesameTest
     {
         super.setUp();
         
+        this.testContextUri = this.getTestValueFactory().createURI("urn:test:plantontology:context");
+        this.testInferredContextUri = this.getTestValueFactory().createURI("urn:test:plantontology:inferred:context");
     }
     
     /**
@@ -100,9 +102,6 @@ public class SesamePropertyPathBindingBugTest extends AbstractSesameTest
                         .getResourceAsStream("/plant_ontology-v16.owl"), new RDFXMLOntologyFormatFactory()));
         
         Assert.assertFalse(this.parsedOntology.isEmpty());
-        
-        this.testContextUri = this.getTestValueFactory().createURI("urn:test:plantontology:context");
-        this.testInferredContextUri = this.getTestValueFactory().createURI("urn:test:plantontology:inferred:context");
         
         final RDFInserter repositoryHandler = new RDFInserter(this.getTestRepositoryConnection());
         repositoryHandler.enforceContext(this.testContextUri);
@@ -475,6 +474,8 @@ public class SesamePropertyPathBindingBugTest extends AbstractSesameTest
         testDataset.addDefaultGraph(this.testContextUri);
         // switch to a single context to see if that makes a difference
         // testDataset.addDefaultGraph(this.testInferredContextUri);
+        Assert.assertFalse(testDataset.getDefaultGraphs().isEmpty());
+        Assert.assertNotNull(testDataset.getDefaultGraphs().iterator().next());
         
         query.setDataset(testDataset);
         
