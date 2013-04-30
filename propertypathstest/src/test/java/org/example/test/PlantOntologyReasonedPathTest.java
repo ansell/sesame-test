@@ -6,6 +6,7 @@ package org.example.test;
 import info.aduna.iteration.Iterations;
 
 import java.io.PrintWriter;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -14,11 +15,15 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.openrdf.model.BNode;
 import org.openrdf.model.Literal;
+import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
+import org.openrdf.model.impl.LinkedHashModel;
+import org.openrdf.model.util.ModelUtil;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.query.Binding;
@@ -125,8 +130,8 @@ public class PlantOntologyReasonedPathTest extends AbstractSesameTest
         inferredRepositoryHandler.enforceContext(this.testInferredContextUri);
         
         final RioRenderer inferencesRenderer =
-                new RioRenderer(inferredAxiomsOntology, this.manager, inferredRepositoryHandler, null,
-                        this.testInferredContextUri);
+                new RioRenderer(inferredAxiomsOntology, this.manager, inferredRepositoryHandler,
+                        new RDFXMLOntologyFormatFactory().getNewFormat(), this.testInferredContextUri);
         inferencesRenderer.render();
         this.getTestRepositoryConnection().commit();
         
@@ -140,6 +145,65 @@ public class PlantOntologyReasonedPathTest extends AbstractSesameTest
                 this.log.trace(nextStatement.toString());
             }
         }
+        
+        Model parse =
+                Rio.parse(this.getClass().getResourceAsStream("/alp-testdata-extended.ttl"), "", RDFFormat.TURTLE);
+        
+        Assert.assertEquals(17, parse.subjects().size());
+        
+        debugStatements(parse);
+        
+        System.out.println("-------\nend static data\n\n");
+        
+        for(Resource nextSubject : parse.subjects())
+        {
+            Model debugStatements =
+                    debugStatements((URI)nextSubject, RDFS.LABEL, null, getTestRepositoryConnection(),
+                            this.testContextUri, this.testInferredContextUri);
+            
+            uriModelStatementsSubset(debugStatements, parse);
+            
+            debugStatements =
+                    debugStatements((URI)nextSubject, RDFS.SUBCLASSOF, null, getTestRepositoryConnection(),
+                            this.testContextUri, this.testInferredContextUri);
+            
+            uriModelStatementsSubset(debugStatements, parse);
+            
+            debugStatements =
+                    debugStatements((URI)nextSubject, RDF.TYPE, null, getTestRepositoryConnection(),
+                            this.testContextUri, this.testInferredContextUri);
+            
+            uriModelStatementsSubset(debugStatements, parse);
+            
+            debugStatements =
+                    debugStatements(null, RDFS.LABEL, (URI)nextSubject, getTestRepositoryConnection(),
+                            this.testContextUri, this.testInferredContextUri);
+            
+            uriModelStatementsSubset(debugStatements, parse);
+            
+            debugStatements =
+                    debugStatements(null, RDFS.SUBCLASSOF, (URI)nextSubject, getTestRepositoryConnection(),
+                            this.testContextUri, this.testInferredContextUri);
+            
+            uriModelStatementsSubset(debugStatements, parse);
+        }
+        
+        System.out.println("------\nEndInitialDump");
+    }
+    
+    private void uriModelStatementsSubset(Model debugStatements, Model parse)
+    {
+        for(Statement nextStatement : debugStatements)
+        {
+            if(nextStatement.getSubject() instanceof URI
+                    && nextStatement.getObject() instanceof URI
+                    && !parse.contains(nextStatement.getSubject(), nextStatement.getPredicate(),
+                            nextStatement.getObject()))
+            {
+                Assert.fail("Could not find statement in parse: " + nextStatement.toString());
+            }
+        }
+        
     }
     
     /**
@@ -746,11 +810,19 @@ public class PlantOntologyReasonedPathTest extends AbstractSesameTest
     @Test
     public final void testTuplesWithInferredSpecificMixtureUpTo5LevelsDeep() throws Exception
     {
+        StringBuilder queryString = new StringBuilder(256);
+        
+        queryString.append("SELECT DISTINCT ?parent (COUNT(DISTINCT ?child) AS ?childCount) ");
+        queryString.append("WHERE { ");
+        queryString.append(" ?child rdfs:subClassOf+ ?parent . ");
+        queryString.append(" } ");
+        queryString.append("GROUP BY ?parent");
+        
+        String originalQuery =
+                "SELECT DISTINCT ?parent ?child WHERE { ?child a <http://www.w3.org/2002/07/owl#Class> . ?child <http://www.w3.org/2000/01/rdf-schema#subClassOf>+ ?parent . FILTER(isIRI(?child) && isIRI(?parent)) }";
+        
         final TupleQuery query =
-                this.getTestRepositoryConnection()
-                        .prepareTupleQuery(
-                                QueryLanguage.SPARQL,
-                                "SELECT DISTINCT ?parent ?child WHERE { ?child a <http://www.w3.org/2002/07/owl#Class> . ?child <http://www.w3.org/2000/01/rdf-schema#subClassOf>+ ?parent . FILTER(isIRI(?child) && isIRI(?parent)) } ");
+                this.getTestRepositoryConnection().prepareTupleQuery(QueryLanguage.SPARQL, queryString.toString());
         
         final DatasetImpl testDataset = new DatasetImpl();
         testDataset.addDefaultGraph(this.testContextUri);
@@ -765,27 +837,35 @@ public class PlantOntologyReasonedPathTest extends AbstractSesameTest
         
         final AtomicInteger bindingCount = new AtomicInteger(0);
         
-        debugStatements(this.getTestValueFactory().createURI("http://purl.obolibrary.org/obo/PO_0000074"),
-                RDFS.SUBCLASSOF, null, this.getTestRepositoryConnection(), this.testContextUri,
-                this.testInferredContextUri);
+        // debugStatements(null, RDFS.SUBCLASSOF, null, this.getTestRepositoryConnection(),
+        // this.testContextUri,
+        // this.testInferredContextUri);
         
-        debugStatements(null, RDFS.SUBCLASSOF,
-                this.getTestValueFactory().createURI("http://purl.obolibrary.org/obo/PO_0000074"),
-                this.getTestRepositoryConnection(), this.testContextUri, this.testInferredContextUri);
-        
-        debugStatements(this.getTestValueFactory().createURI("http://purl.obolibrary.org/obo/PO_0000074"), RDF.TYPE,
-                null, this.getTestRepositoryConnection(), this.testContextUri, this.testInferredContextUri);
-        
-        debugStatements(null, RDF.TYPE,
-                this.getTestValueFactory().createURI("http://purl.obolibrary.org/obo/PO_0000074"),
-                this.getTestRepositoryConnection(), this.testContextUri, this.testInferredContextUri);
-        
-        debugStatements(this.getTestValueFactory().createURI("http://purl.obolibrary.org/obo/PO_0000074"), RDFS.LABEL,
-                null, this.getTestRepositoryConnection(), this.testContextUri, this.testInferredContextUri);
-        
-        debugStatements(null, RDFS.LABEL,
-                this.getTestValueFactory().createURI("http://purl.obolibrary.org/obo/PO_0000074"),
-                this.getTestRepositoryConnection(), this.testContextUri, this.testInferredContextUri);
+        // debugStatements(this.getTestValueFactory().createURI("http://purl.obolibrary.org/obo/PO_0000074"),
+        // RDFS.SUBCLASSOF, null, this.getTestRepositoryConnection(), this.testContextUri,
+        // this.testInferredContextUri);
+        //
+        // debugStatements(null, RDFS.SUBCLASSOF,
+        // this.getTestValueFactory().createURI("http://purl.obolibrary.org/obo/PO_0000074"),
+        // this.getTestRepositoryConnection(), this.testContextUri, this.testInferredContextUri);
+        //
+        // debugStatements(this.getTestValueFactory().createURI("http://purl.obolibrary.org/obo/PO_0000074"),
+        // RDF.TYPE,
+        // null, this.getTestRepositoryConnection(), this.testContextUri,
+        // this.testInferredContextUri);
+        //
+        // debugStatements(null, RDF.TYPE,
+        // this.getTestValueFactory().createURI("http://purl.obolibrary.org/obo/PO_0000074"),
+        // this.getTestRepositoryConnection(), this.testContextUri, this.testInferredContextUri);
+        //
+        // debugStatements(this.getTestValueFactory().createURI("http://purl.obolibrary.org/obo/PO_0000074"),
+        // RDFS.LABEL,
+        // null, this.getTestRepositoryConnection(), this.testContextUri,
+        // this.testInferredContextUri);
+        //
+        // debugStatements(null, RDFS.LABEL,
+        // this.getTestValueFactory().createURI("http://purl.obolibrary.org/obo/PO_0000074"),
+        // this.getTestRepositoryConnection(), this.testContextUri, this.testInferredContextUri);
         
         try
         {
@@ -806,8 +886,9 @@ public class PlantOntologyReasonedPathTest extends AbstractSesameTest
                     }
                 }
                 
-                Assert.assertTrue(bindingSet.hasBinding("child"));
+                Assert.assertTrue(bindingSet.hasBinding("childCount"));
                 
+                Assert.assertEquals(16, ((Literal)bindingSet.getBinding("childCount").getValue()).intValue());
                 // System.out.println("");
                 //
                 // debugStatements((URI)bindingSet.getBinding("child").getValue(), RDFS.LABEL, null,
@@ -818,20 +899,28 @@ public class PlantOntologyReasonedPathTest extends AbstractSesameTest
                 // System.out.println("All statements about: " +
                 // bindingSet.getBinding("child").getValue().stringValue());
                 
-                debugStatements((URI)bindingSet.getBinding("child").getValue(), RDFS.SUBCLASSOF, null,
-                        this.getTestRepositoryConnection(), this.testContextUri, this.testInferredContextUri);
-                debugStatements(null, RDFS.SUBCLASSOF, (URI)bindingSet.getBinding("child").getValue(),
-                        this.getTestRepositoryConnection(), this.testContextUri, this.testInferredContextUri);
-                
-                debugStatements((URI)bindingSet.getBinding("child").getValue(), RDF.TYPE, null,
-                        this.getTestRepositoryConnection(), this.testContextUri, this.testInferredContextUri);
-                debugStatements(null, RDF.TYPE, (URI)bindingSet.getBinding("child").getValue(),
-                        this.getTestRepositoryConnection(), this.testContextUri, this.testInferredContextUri);
-                
-                debugStatements((URI)bindingSet.getBinding("child").getValue(), RDFS.LABEL, null,
-                        this.getTestRepositoryConnection(), this.testContextUri, this.testInferredContextUri);
-                debugStatements(null, RDFS.LABEL, (URI)bindingSet.getBinding("child").getValue(),
-                        this.getTestRepositoryConnection(), this.testContextUri, this.testInferredContextUri);
+                // debugStatements((URI)bindingSet.getBinding("child").getValue(), RDFS.SUBCLASSOF,
+                // null,
+                // this.getTestRepositoryConnection(), this.testContextUri,
+                // this.testInferredContextUri);
+                // debugStatements(null, RDFS.SUBCLASSOF,
+                // (URI)bindingSet.getBinding("child").getValue(),
+                // this.getTestRepositoryConnection(), this.testContextUri,
+                // this.testInferredContextUri);
+                //
+                // debugStatements((URI)bindingSet.getBinding("child").getValue(), RDF.TYPE, null,
+                // this.getTestRepositoryConnection(), this.testContextUri,
+                // this.testInferredContextUri);
+                // debugStatements(null, RDF.TYPE, (URI)bindingSet.getBinding("child").getValue(),
+                // this.getTestRepositoryConnection(), this.testContextUri,
+                // this.testInferredContextUri);
+                //
+                // debugStatements((URI)bindingSet.getBinding("child").getValue(), RDFS.LABEL, null,
+                // this.getTestRepositoryConnection(), this.testContextUri,
+                // this.testInferredContextUri);
+                // debugStatements(null, RDFS.LABEL, (URI)bindingSet.getBinding("child").getValue(),
+                // this.getTestRepositoryConnection(), this.testContextUri,
+                // this.testInferredContextUri);
             }
         }
         finally
@@ -839,15 +928,48 @@ public class PlantOntologyReasonedPathTest extends AbstractSesameTest
             queryResult.close();
         }
         
-        Assert.assertEquals(16, bindingCount.get());
+        // Assert.assertEquals(16, bindingCount.get());
+        Assert.assertEquals(1, bindingCount.get());
     }
     
-    private void debugStatements(URI subjectUri, URI predicateUri, Value objectValue, RepositoryConnection conn,
+    private Model debugStatements(URI subjectUri, URI predicateUri, Value objectValue, RepositoryConnection conn,
             Resource... contexts) throws Exception
     {
-        RepositoryResult<Statement> statements =
-                conn.getStatements(subjectUri, predicateUri, objectValue, true, contexts);
-        Rio.write(Iterations.asList(statements), System.out, RDFFormat.NTRIPLES);
+        Model statements =
+                new LinkedHashModel(Iterations.asList(conn.getStatements(subjectUri, predicateUri, objectValue, true,
+                        contexts)));
+        
+        for(Resource nextSubject : new HashSet<Resource>(statements.subjects()))
+        {
+            if(nextSubject instanceof BNode)
+            {
+                statements.remove(nextSubject, null, null);
+            }
+        }
+        
+        for(Value nextObject : new HashSet<Value>(statements.objects()))
+        {
+            if(nextObject instanceof BNode)
+            {
+                statements.remove(null, null, nextObject);
+            }
+        }
+        
+        Model results = new LinkedHashModel(statements.getNamespaces());
+        
+        for(Statement nextStatement : statements)
+        {
+            results.add(conn.getValueFactory().createStatement(nextStatement.getSubject(),
+                    nextStatement.getPredicate(), nextStatement.getObject()));
+        }
+        
+        Rio.write(results, System.out, RDFFormat.NQUADS);
+        return results;
+    }
+    
+    private void debugStatements(Model model) throws Exception
+    {
+        Rio.write(model, System.out, RDFFormat.NQUADS);
     }
     
     @Test
