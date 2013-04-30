@@ -15,8 +15,12 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.model.Literal;
+import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
+import org.openrdf.model.Value;
+import org.openrdf.model.vocabulary.RDF;
+import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.query.Binding;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.GraphQuery;
@@ -25,7 +29,11 @@ import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.TupleQuery;
 import org.openrdf.query.TupleQueryResult;
 import org.openrdf.query.impl.DatasetImpl;
+import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.RepositoryResult;
 import org.openrdf.repository.util.RDFInserter;
+import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.Rio;
 import org.semanticweb.owlapi.formats.RDFXMLOntologyFormatFactory;
 import org.semanticweb.owlapi.io.StreamDocumentSource;
 import org.semanticweb.owlapi.model.IRI;
@@ -692,7 +700,7 @@ public class PlantOntologyReasonedPathTest extends AbstractSesameTest
                 this.getTestRepositoryConnection()
                         .prepareTupleQuery(
                                 QueryLanguage.SPARQL,
-                                "SELECT ?parent ?child WHERE { ?parent a <http://www.w3.org/2002/07/owl#Class> . ?parent <http://www.w3.org/2000/01/rdf-schema#subClassOf>+ ?child . FILTER(isIRI(?child) && isIRI(?parent)) } ");
+                                "SELECT ?parent ?child WHERE { ?child a <http://www.w3.org/2002/07/owl#Class> . ?child <http://www.w3.org/2000/01/rdf-schema#subClassOf>+ ?parent . FILTER(isIRI(?child) && isIRI(?parent)) } ");
         
         final DatasetImpl testDataset = new DatasetImpl();
         testDataset.addDefaultGraph(this.testContextUri);
@@ -733,6 +741,113 @@ public class PlantOntologyReasonedPathTest extends AbstractSesameTest
         }
         
         Assert.assertEquals(20, bindingCount.get());
+    }
+    
+    @Test
+    public final void testTuplesWithInferredSpecificMixtureUpTo5LevelsDeep() throws Exception
+    {
+        final TupleQuery query =
+                this.getTestRepositoryConnection()
+                        .prepareTupleQuery(
+                                QueryLanguage.SPARQL,
+                                "SELECT DISTINCT ?parent ?child WHERE { ?child a <http://www.w3.org/2002/07/owl#Class> . ?child <http://www.w3.org/2000/01/rdf-schema#subClassOf>+ ?parent . FILTER(isIRI(?child) && isIRI(?parent)) } ");
+        
+        final DatasetImpl testDataset = new DatasetImpl();
+        testDataset.addDefaultGraph(this.testContextUri);
+        testDataset.addDefaultGraph(this.testInferredContextUri);
+        
+        query.setDataset(testDataset);
+        
+        query.clearBindings();
+        query.setBinding("parent", this.getTestValueFactory().createURI("http://purl.obolibrary.org/obo/PO_0000074"));
+        
+        final TupleQueryResult queryResult = query.evaluate();
+        
+        final AtomicInteger bindingCount = new AtomicInteger(0);
+        
+        debugStatements(this.getTestValueFactory().createURI("http://purl.obolibrary.org/obo/PO_0000074"),
+                RDFS.SUBCLASSOF, null, this.getTestRepositoryConnection(), this.testContextUri,
+                this.testInferredContextUri);
+        
+        debugStatements(null, RDFS.SUBCLASSOF,
+                this.getTestValueFactory().createURI("http://purl.obolibrary.org/obo/PO_0000074"),
+                this.getTestRepositoryConnection(), this.testContextUri, this.testInferredContextUri);
+        
+        debugStatements(this.getTestValueFactory().createURI("http://purl.obolibrary.org/obo/PO_0000074"), RDF.TYPE,
+                null, this.getTestRepositoryConnection(), this.testContextUri, this.testInferredContextUri);
+        
+        debugStatements(null, RDF.TYPE,
+                this.getTestValueFactory().createURI("http://purl.obolibrary.org/obo/PO_0000074"),
+                this.getTestRepositoryConnection(), this.testContextUri, this.testInferredContextUri);
+        
+        debugStatements(this.getTestValueFactory().createURI("http://purl.obolibrary.org/obo/PO_0000074"), RDFS.LABEL,
+                null, this.getTestRepositoryConnection(), this.testContextUri, this.testInferredContextUri);
+        
+        debugStatements(null, RDFS.LABEL,
+                this.getTestValueFactory().createURI("http://purl.obolibrary.org/obo/PO_0000074"),
+                this.getTestRepositoryConnection(), this.testContextUri, this.testInferredContextUri);
+        
+        try
+        {
+            Assert.assertTrue(queryResult.hasNext());
+            
+            while(queryResult.hasNext())
+            {
+                final BindingSet bindingSet = queryResult.next();
+                
+                bindingCount.incrementAndGet();
+                
+                if(this.log.isInfoEnabled())
+                {
+                    for(final Binding nextBinding : bindingSet)
+                    {
+                        // this.log.info("nextBinding name=" + nextBinding.getName() + " value="
+                        // + nextBinding.getValue().stringValue());
+                    }
+                }
+                
+                Assert.assertTrue(bindingSet.hasBinding("child"));
+                
+                // System.out.println("");
+                //
+                // debugStatements((URI)bindingSet.getBinding("child").getValue(), RDFS.LABEL, null,
+                // this.getTestRepositoryConnection(), this.testContextUri,
+                // this.testInferredContextUri);
+                //
+                // System.out.println("");
+                // System.out.println("All statements about: " +
+                // bindingSet.getBinding("child").getValue().stringValue());
+                
+                debugStatements((URI)bindingSet.getBinding("child").getValue(), RDFS.SUBCLASSOF, null,
+                        this.getTestRepositoryConnection(), this.testContextUri, this.testInferredContextUri);
+                debugStatements(null, RDFS.SUBCLASSOF, (URI)bindingSet.getBinding("child").getValue(),
+                        this.getTestRepositoryConnection(), this.testContextUri, this.testInferredContextUri);
+                
+                debugStatements((URI)bindingSet.getBinding("child").getValue(), RDF.TYPE, null,
+                        this.getTestRepositoryConnection(), this.testContextUri, this.testInferredContextUri);
+                debugStatements(null, RDF.TYPE, (URI)bindingSet.getBinding("child").getValue(),
+                        this.getTestRepositoryConnection(), this.testContextUri, this.testInferredContextUri);
+                
+                debugStatements((URI)bindingSet.getBinding("child").getValue(), RDFS.LABEL, null,
+                        this.getTestRepositoryConnection(), this.testContextUri, this.testInferredContextUri);
+                debugStatements(null, RDFS.LABEL, (URI)bindingSet.getBinding("child").getValue(),
+                        this.getTestRepositoryConnection(), this.testContextUri, this.testInferredContextUri);
+            }
+        }
+        finally
+        {
+            queryResult.close();
+        }
+        
+        Assert.assertEquals(16, bindingCount.get());
+    }
+    
+    private void debugStatements(URI subjectUri, URI predicateUri, Value objectValue, RepositoryConnection conn,
+            Resource... contexts) throws Exception
+    {
+        RepositoryResult<Statement> statements =
+                conn.getStatements(subjectUri, predicateUri, objectValue, true, contexts);
+        Rio.write(Iterations.asList(statements), System.out, RDFFormat.NTRIPLES);
     }
     
     @Test
