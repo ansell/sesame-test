@@ -16,6 +16,7 @@ import org.junit.Test;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
+import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.GraphQuery;
 import org.openrdf.query.QueryLanguage;
@@ -91,7 +92,6 @@ public class SesamePropertyPathBindingBugTest extends AbstractSesameTest
      * 
      * @throws Exception
      */
-    @Ignore
     @Test
     public final void testFromCountWithInferredSpecificDistinctOWLThingAlternative() throws Exception
     {
@@ -166,7 +166,7 @@ public class SesamePropertyPathBindingBugTest extends AbstractSesameTest
         
         query.setDataset(testDataset);
         
-        query.setBinding("parent", this.getTestValueFactory().createURI("http://www.w3.org/2002/07/owl#Thing"));
+        query.setBinding("parent", OWL.THING);
         
         final TupleQueryResult queryResult = query.evaluate();
         
@@ -226,7 +226,7 @@ public class SesamePropertyPathBindingBugTest extends AbstractSesameTest
         
         query.setDataset(testDataset);
         
-        query.setBinding("parent", this.getTestValueFactory().createURI("http://www.w3.org/2002/07/owl#Thing"));
+        query.setBinding("parent", OWL.THING);
         
         final TupleQueryResult queryResult = query.evaluate();
         
@@ -283,7 +283,7 @@ public class SesamePropertyPathBindingBugTest extends AbstractSesameTest
         
         query.setDataset(testDataset);
         
-        query.setBinding("parent", this.getTestValueFactory().createURI("http://www.w3.org/2002/07/owl#Thing"));
+        query.setBinding("parent", OWL.THING);
         
         final TupleQueryResult queryResult = query.evaluate();
         
@@ -340,7 +340,7 @@ public class SesamePropertyPathBindingBugTest extends AbstractSesameTest
         
         query.setDataset(testDataset);
         
-        query.setBinding("parent", this.getTestValueFactory().createURI("http://www.w3.org/2002/07/owl#Thing"));
+        query.setBinding("parent", OWL.THING);
         
         final TupleQueryResult queryResult = query.evaluate();
         
@@ -408,7 +408,7 @@ public class SesamePropertyPathBindingBugTest extends AbstractSesameTest
         
         query.setDataset(testDataset);
         
-        query.setBinding("parent", this.getTestValueFactory().createURI("http://www.w3.org/2002/07/owl#Thing"));
+        query.setBinding("parent", OWL.THING);
         
         final TupleQueryResult queryResult = query.evaluate();
         
@@ -700,7 +700,7 @@ public class SesamePropertyPathBindingBugTest extends AbstractSesameTest
         
         query.setDataset(testDataset);
         
-        query.setBinding("parent", this.getTestValueFactory().createURI("http://www.w3.org/2002/07/owl#Thing"));
+        query.setBinding("parent", OWL.THING);
         
         final TupleQueryResult queryResult = query.evaluate();
         
@@ -763,7 +763,7 @@ public class SesamePropertyPathBindingBugTest extends AbstractSesameTest
         
         query.setDataset(testDataset);
         
-        query.setBinding("parent", this.getTestValueFactory().createURI("http://www.w3.org/2002/07/owl#Thing"));
+        query.setBinding("parent", OWL.THING);
         
         final TupleQueryResult queryResult = query.evaluate();
         
@@ -827,7 +827,7 @@ public class SesamePropertyPathBindingBugTest extends AbstractSesameTest
         
         query.setDataset(testDataset);
         
-        query.setBinding("parent", this.getTestValueFactory().createURI("http://www.w3.org/2002/07/owl#Thing"));
+        query.setBinding("parent", OWL.THING);
         
         final TupleQueryResult queryResult = query.evaluate();
         
@@ -891,7 +891,7 @@ public class SesamePropertyPathBindingBugTest extends AbstractSesameTest
         
         query.setDataset(testDataset);
         
-        query.setBinding("parent", this.getTestValueFactory().createURI("http://www.w3.org/2002/07/owl#Thing"));
+        query.setBinding("parent", OWL.THING);
         
         final TupleQueryResult queryResult = query.evaluate();
         
@@ -947,7 +947,7 @@ public class SesamePropertyPathBindingBugTest extends AbstractSesameTest
         
         query.setDataset(testDataset);
         
-        query.setBinding("parent", this.getTestValueFactory().createURI("http://www.w3.org/2002/07/owl#Thing"));
+        query.setBinding("parent", OWL.THING);
         
         final TupleQueryResult queryResult = query.evaluate();
         
@@ -1011,7 +1011,7 @@ public class SesamePropertyPathBindingBugTest extends AbstractSesameTest
         // testDataset.addDefaultGraph(this.testInferredContextUri);
         query.setDataset(testDataset);
         
-        query.setBinding("parent", this.getTestValueFactory().createURI("http://www.w3.org/2002/07/owl#Thing"));
+        query.setBinding("parent", OWL.THING);
         
         final TupleQueryResult queryResult = query.evaluate();
         
@@ -1076,7 +1076,7 @@ public class SesamePropertyPathBindingBugTest extends AbstractSesameTest
         // testDataset.addDefaultGraph(this.testInferredContextUri);
         query.setDataset(testDataset);
         
-        query.setBinding("parent", this.getTestValueFactory().createURI("http://www.w3.org/2002/07/owl#Thing"));
+        query.setBinding("parent", OWL.THING);
         
         final TupleQueryResult queryResult = query.evaluate();
         
@@ -1140,7 +1140,7 @@ public class SesamePropertyPathBindingBugTest extends AbstractSesameTest
         // testDataset.addDefaultGraph(this.testInferredContextUri);
         query.setDataset(testDataset);
         
-        query.setBinding("parent", this.getTestValueFactory().createURI("http://www.w3.org/2002/07/owl#Thing"));
+        query.setBinding("parent", OWL.THING);
         
         final TupleQueryResult queryResult = query.evaluate();
         
