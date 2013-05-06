@@ -72,7 +72,7 @@ public class AbstractSesameTest
         this.testValueFactory = this.testRepository.getValueFactory();
         
         this.testRepositoryConnection = this.testRepository.getConnection();
-        this.testRepositoryConnection.setAutoCommit(false);
+        this.testRepositoryConnection.begin();
     }
     
     /**
@@ -81,8 +81,20 @@ public class AbstractSesameTest
     @After
     public void tearDown() throws Exception
     {
-        if(this.testRepositoryConnection != null)
+        if(this.testRepositoryConnection != null && this.testRepositoryConnection.isOpen())
         {
+            if(this.testRepositoryConnection.isActive())
+            {
+                try
+                {
+                    this.testRepositoryConnection.rollback();
+                }
+                catch(final RepositoryException e)
+                {
+                    this.log.error("Test repository connection could not be rolled back", e);
+                }
+            }
+            
             try
             {
                 this.testRepositoryConnection.close();
