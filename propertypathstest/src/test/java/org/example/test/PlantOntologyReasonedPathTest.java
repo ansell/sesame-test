@@ -476,7 +476,7 @@ public class PlantOntologyReasonedPathTest extends AbstractSesameTest
                 
                 final Literal value = (Literal)bindingSet.getBinding("childCount").getValue();
                 
-                Assert.assertEquals(20, value.intValue());
+                Assert.assertEquals(16, value.intValue());
                 
                 Assert.assertFalse("Should only have been one result binding", queryResult.hasNext());
             }
@@ -764,7 +764,7 @@ public class PlantOntologyReasonedPathTest extends AbstractSesameTest
                 this.getTestRepositoryConnection()
                         .prepareTupleQuery(
                                 QueryLanguage.SPARQL,
-                                "SELECT ?parent ?child WHERE { ?child a <http://www.w3.org/2002/07/owl#Class> . ?child <http://www.w3.org/2000/01/rdf-schema#subClassOf>+ ?parent . FILTER(isIRI(?child) && isIRI(?parent)) } ");
+                                "SELECT DISTINCT ?parent ?child WHERE { ?child a <http://www.w3.org/2002/07/owl#Class> . ?child <http://www.w3.org/2000/01/rdf-schema#subClassOf>+ ?parent . FILTER(isIRI(?child) && isIRI(?parent)) } ");
         
         final DatasetImpl testDataset = new DatasetImpl();
         testDataset.addDefaultGraph(this.testContextUri);
@@ -804,7 +804,7 @@ public class PlantOntologyReasonedPathTest extends AbstractSesameTest
             queryResult.close();
         }
         
-        Assert.assertEquals(20, bindingCount.get());
+        Assert.assertEquals(11, bindingCount.get());
     }
     
     @Test
@@ -1065,7 +1065,7 @@ public class PlantOntologyReasonedPathTest extends AbstractSesameTest
             queryResult.close();
         }
         
-        Assert.assertEquals(18832, bindingCount.get());
+        Assert.assertEquals(16034, bindingCount.get());
     }
     
     @Test
