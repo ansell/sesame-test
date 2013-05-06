@@ -49,7 +49,7 @@ public class OWLXMLSesameRDFXMLParsingTest extends AbstractSesameTest
     public final void testOWLXMLParsingUsingRDFXMLParser() throws RDFParseException, RepositoryException, IOException
     {
         final AtomicInteger failures = new AtomicInteger(0);
-        for(int i = 0; i < 100000; i++)
+        for(int i = 0; i < 10000; i++)
         {
             try
             {
@@ -69,7 +69,7 @@ public class OWLXMLSesameRDFXMLParsingTest extends AbstractSesameTest
             }
         }
         
-        Assert.assertEquals(100000, failures.get());
+        Assert.assertEquals(10000, failures.get());
     }
     
 }
