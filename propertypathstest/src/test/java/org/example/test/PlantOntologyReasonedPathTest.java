@@ -1075,7 +1075,7 @@ public class PlantOntologyReasonedPathTest extends AbstractSesameTest
                 this.getTestRepositoryConnection()
                         .prepareTupleQuery(
                                 QueryLanguage.SPARQL,
-                                "SELECT ?class ?subclassof WHERE { ?class a <http://www.w3.org/2002/07/owl#Class> . ?class <http://www.w3.org/2000/01/rdf-schema#subClassOf>+ ?subclassof . FILTER(isIRI(?class) && isIRI(?subclassof)) }");
+                                "SELECT DISTINCT ?class ?subclassof WHERE { ?class a <http://www.w3.org/2002/07/owl#Class> . ?class <http://www.w3.org/2000/01/rdf-schema#subClassOf>+ ?subclassof . FILTER(isIRI(?class) && isIRI(?subclassof)) }");
         
         // test with a dataset that does not contain the inferred statements context
         final DatasetImpl testDataset = new DatasetImpl();
