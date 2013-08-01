@@ -148,9 +148,9 @@ public class OBO2OWLConverter
      */
     public static void main(final String[] args) throws Exception
     {
-        InputStream resource = OBO2OWLConverter.class.getResourceAsStream("/trait_vunknown-20130624.obo");
+        InputStream resource = OBO2OWLConverter.class.getResourceAsStream("/obi.obo");
         
-        Writer writer = new FileWriter("/home/peter/temp/trait-ontology-20130624.owl", false);
+        Writer writer = new FileWriter("/home/peter/temp/obi.owl", false);
         
         List<Namespace> namespaces = new ArrayList<Namespace>();
         
