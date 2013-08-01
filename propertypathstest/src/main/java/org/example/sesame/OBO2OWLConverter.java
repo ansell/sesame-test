@@ -65,7 +65,11 @@ public class OBO2OWLConverter
         List<String> missingAnnotationProperties =
                 Arrays.asList("http://purl.obolibrary.org/obo/def",
                         "http://www.geneontology.org/formats/oboInOWL#xref",
-                        "http://www.geneontology.org/formats/oboInOWL#hasRelatedSynonym");
+                        "http://www.geneontology.org/formats/oboInOWL#hasRelatedSynonym",
+                        "http://www.geneontology.org/formats/oboInOWL#hasNarrowSynonym",
+                        "http://www.geneontology.org/formats/oboInOWL#hasExactSynonym",
+                        "http://www.geneontology.org/formats/oboInOWL#hasAlternativeId",
+                        "http://www.geneontology.org/formats/oboInOWL#hasBroadSynonym");
         for(String nextMissingProperty : missingAnnotationProperties)
         {
             OWLAnnotationProperty owlProperty = df.getOWLAnnotationProperty(IRI.create(nextMissingProperty));
@@ -144,9 +148,9 @@ public class OBO2OWLConverter
      */
     public static void main(final String[] args) throws Exception
     {
-        InputStream resource = OBO2OWLConverter.class.getResourceAsStream("/crop-ontology-715.obo");
+        InputStream resource = OBO2OWLConverter.class.getResourceAsStream("/trait_vunknown-20130624.obo");
         
-        Writer writer = new FileWriter("/home/peter/temp/crop-ontology-715.owl");
+        Writer writer = new FileWriter("/home/peter/temp/trait-ontology-20130624.owl", false);
         
         List<Namespace> namespaces = new ArrayList<Namespace>();
         
