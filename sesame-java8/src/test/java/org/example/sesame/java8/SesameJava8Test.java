@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.openrdf.model.BNode;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Model;
 import org.openrdf.model.Statement;
@@ -46,7 +47,69 @@ public class SesameJava8Test {
 	}
 
 	@Test
+	public final void testBlankNodeSubjects() {
+		Set<BNode> bNodeSubjects = model.stream()
+				.filter((Statement st) -> st.getSubject() instanceof BNode)
+				.map(st -> (BNode) st.getSubject()).collect(Collectors.toSet());
+
+		assertEquals(1, bNodeSubjects.size());
+	}
+
+	@Test
+	public final void testPredicates() {
+		Set<URI> predicates = model.stream().map(st -> st.getPredicate())
+				.collect(Collectors.toSet());
+
+		assertEquals(1, predicates.size());
+	}
+
+	@Test
+	public final void testBlankNodeObjects() {
+		Set<BNode> bNodeObjects = model.stream()
+				.filter((Statement st) -> st.getObject() instanceof BNode)
+				.map(st -> (BNode) st.getObject()).collect(Collectors.toSet());
+
+		assertEquals(1, bNodeObjects.size());
+	}
+
+	@Test
+	public final void testNonLanguageLiterals() {
+		Set<Literal> nonLanguageLiterals = model
+				.stream()
+				.filter((Statement st) -> (st.getObject() instanceof Literal && !Literals
+						.isLanguageLiteral((Literal) st.getObject())))
+				.map(st -> (Literal) st.getObject())
+				.collect(Collectors.toSet());
+
+		assertEquals(19, nonLanguageLiterals.size());
+	}
+
+	@Test
+	public final void testNonLanguageLiteralDatatypes() {
+		Set<URI> nonLanguageLiteralDatatypes = model
+				.stream()
+				.filter((Statement st) -> (st.getObject() instanceof Literal && !Literals
+						.isLanguageLiteral((Literal) st.getObject())))
+				.map(st -> ((Literal) st.getObject()).getDatatype())
+				.collect(Collectors.toSet());
+
+		assertEquals(3, nonLanguageLiteralDatatypes.size());
+	}
+
+	@Test
 	public final void testLanguageLiterals() {
+		Set<Literal> languageLiterals = model
+				.stream()
+				.filter((Statement st) -> (st.getObject() instanceof Literal && Literals
+						.isLanguageLiteral((Literal) st.getObject())))
+				.map(st -> (Literal) st.getObject())
+				.collect(Collectors.toSet());
+
+		assertEquals(2, languageLiterals.size());
+	}
+
+	@Test
+	public final void testLanguageTags() {
 		Set<String> languageTags = model
 				.stream()
 				.filter((Statement st) -> (st.getObject() instanceof Literal && Literals
