@@ -47,6 +47,15 @@ public class SesameJava8Test {
 	}
 
 	@Test
+	public final void testURISubjects() {
+		Set<URI> uriSubjects = model.stream()
+				.filter((Statement st) -> st.getSubject() instanceof URI)
+				.map(st -> (URI) st.getSubject()).collect(Collectors.toSet());
+
+		assertEquals(27, uriSubjects.size());
+	}
+
+	@Test
 	public final void testBlankNodeSubjects() {
 		Set<BNode> bNodeSubjects = model.stream()
 				.filter((Statement st) -> st.getSubject() instanceof BNode)
